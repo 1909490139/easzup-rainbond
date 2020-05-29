@@ -19,7 +19,10 @@ export KUBEASZ_VER=2.1.0
 export K8S_BIN_VER=v1.16.2
 export EXT_BIN_VER=0.3.2
 export SYS_PKG_VER=0.3.3
-
+export RBD_PKG_VER=5.2.0
+export RBD_CHART_URL=https://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.2/rainbond-operator-chart-v5.2.0-release.tgz
+export MYSQL_CHART_URL=https://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.2/mysql-operator-chart.tgz
+export GFS_YAML_URL=https://github.com/1909490139/gfs-rainbond-5.2/releases/download/7.1/gfs-k8s.tgz
 function install_docker() {
   # check if a container runtime is already installed
   systemctl status docker|grep Active|grep -q running && { echo "[WARN] docker is already running."; return 0; }
@@ -123,7 +126,7 @@ function get_kubeasz() {
 
   echo -e "[INFO] \033[33mdownloading kubeasz\033[0m $KUBEASZ_VER"
   echo "[INFO] run a temporary container"
-  docker run -d --name temp_easz easzlab/kubeasz:${KUBEASZ_VER} || { echo "[ERROR] download failed."; exit 1; }
+  docker run -d --name temp_easz linux2573/kubeasz:${KUBEASZ_VER} || { echo "[ERROR] download failed."; exit 1; }
 
   [[ -f "/etc/ansible/down/docker-${DOCKER_VER}.tgz" ]] && mv "/etc/ansible/down/docker-${DOCKER_VER}.tgz" /tmp
 
@@ -135,6 +138,10 @@ function get_kubeasz() {
 
   sed -i 's/dashboard_install: "yes"/dashboard_install: "no"/g' /etc/ansible/roles/cluster-addon/defaults/main.yml
   sed -i 's/ingress_install: "yes"/ingress_install: "no"/g' /etc/ansible/roles/cluster-addon/defaults/main.yml
+  sed -i 's/^INSTALL_SOURCE.*$/INSTALL_SOURCE: "offline"/g' /etc/ansible/roles/chrony/defaults/main.yml
+  sed -i 's/^INSTALL_SOURCE.*$/INSTALL_SOURCE: "offline"/g' /etc/ansible/roles/ex-lb/defaults/main.yml
+  sed -i 's/^INSTALL_SOURCE.*$/INSTALL_SOURCE: "offline"/g' /etc/ansible/roles/kube-node/defaults/main.yml
+  sed -i 's/^INSTALL_SOURCE.*$/INSTALL_SOURCE: "offline"/g' /etc/ansible/roles/prepare/defaults/main.yml
 
  [[ -f "/tmp/docker-${DOCKER_VER}.tgz" ]] && mv "/tmp/docker-${DOCKER_VER}.tgz" /etc/ansible/down
  return 0
@@ -234,16 +241,79 @@ function get_offline_image() {
     docker save -o ${imageDir}/traefik_${traefikVer}.tar traefik:${traefikVer}
   fi
   if [[ ! -f "$imageDir/kubeasz_$KUBEASZ_VER.tar" ]];then
-    docker pull easzlab/kubeasz:${KUBEASZ_VER} && \
-    docker save -o ${imageDir}/kubeasz_${KUBEASZ_VER}.tar easzlab/kubeasz:${KUBEASZ_VER}
+    docker pull linux2573/kubeasz:${KUBEASZ_VER} && \
+    docker save -o ${imageDir}/kubeasz_${KUBEASZ_VER}.tar linux2573/kubeasz:${KUBEASZ_VER}
   fi
 }
 
 function get_rainbond_pkg() {
-  echo -e "[INFO] \033[33mdownloading helm3\033[0m
+
+  echo -e "[INFO] \033[33mdownloading packages by rainbond\033[0m"
+
+  if [[ ! -d /etc/ansible/rainbond/images ]];then
+    mkdir -p /etc/ansible/rainbond/images
+  fi
+
+  if [[ -f /etc/ansible/bin/helm ]];then
+    rm -rf /etc/ansible/bin/helm
+  fi
+
+  docker pull linux2573/kubeasz-rbd-pkg:${RBD_PKG_VER} && \
+  echo "[INFO] run a temporary container" && \
+  docker run -d --name temp_rbd_pkg linux2573/kubeasz-rbd-pkg:${RBD_PKG_VER} && \
+  echo "[INFO] cp system packages" && \
+  docker cp temp_rbd_pkg:/rainbond-bin/* /etc/ansible/bin && \
+  docker cp temp_rbd_pkg:/rainbond-pkg/* /etc/ansible/down/packages && \
+  echo "[INFO] stop&remove temporary container" && \
+  docker rm -f temp_rbd_pkg
+  
+  wget ${RBD_CHART_URL} -O /etc/ansible/rainbond/rainbond-operator-chart-v5.2.0-release.tgz
+  wget ${MYSQL_CHART_URL} -O /etc/ansible/rainbond/mysql-operator-chart.tgz
+  wget ${GFS_YAML_URL} -O /etc/ansible/rainbond/gfs-k8s.tgz
+
+}
+
+function get_rainbond_image(){
+
+  echo -e "[INFO] \033[33mdownloading rainbond offline images\033[0m"
+
+  while read image_name;do
+    image_tgz=`echo $image_name| tr "/" ":" | awk -F ":" '{print $3".tgz"}'`
+
+    if [[ ! -f /etc/ansible/rainbond/images/${image_tgz} ]];then
+      docker pull ${image_name}
+      docker save ${image_name} > /etc/ansible/rainbond/images/${image_tgz}
+    fi
+    
+  done < ./images_list
+
+  if [[ ! -f /etc/ansible/rainbond/images/mysql-operator.tgz ]];then
+    docker pull registry.cn-hangzhou.aliyuncs.com/abewang/mysql-operator:latest
+    docker save registry.cn-hangzhou.aliyuncs.com/abewang/mysql-operator:latest > /etc/ansible/rainbond/images/mysql-operator.tgz
+  fi
+
+  if [[ ! -f /etc/ansible/rainbond/images/glusterfs-provisioner.tgz ]];then
+    docker pull linux2573/gluster-centos:7.1
+    docker save linux2573/gluster-centos:7.1 > /etc/ansible/rainbond/images/glusterfs-provisioner.tgz
+  fi
+
+  fi [[ ! -f /etc/ansible/rainbond/images/glusterfs-provisioner.tgz ]];then
+    docker pull linux2573/glusterfs-simple-provisioner
+    docker save linux2573/glusterfs-simple-provisioner > /etc/ansible/rainbond/images/glusterfs-provisioner.tgz
+  fi
+
 }
 
 function download_all() {
+  install_docker && \
+  get_kubeasz && \
+  get_k8s_bin && \
+  get_ext_bin && \
+  get_sys_pkg && \
+  get_offline_image
+}
+
+function download_rainbond(){
   install_docker && \
   get_kubeasz && \
   get_k8s_bin && \
@@ -290,7 +360,7 @@ function start_kubeasz_docker() {
       --volume /root/.ssh/id_rsa:/root/.ssh/id_rsa:ro \
       --volume /root/.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub:ro \
       --volume /root/.ssh/known_hosts:/root/.ssh/known_hosts:ro \
-      easzlab/kubeasz:${KUBEASZ_VER} sleep 36000
+      linux2573/kubeasz:${KUBEASZ_VER} sleep 36000
 }
 
 function clean_container() {
@@ -334,6 +404,9 @@ function main() {
           ;;
         D)
           ACTION="download_all"
+          ;;
+        R)
+          ACTION="download_rainbond"
           ;;
         S)
           ACTION="start_kubeasz_docker"
