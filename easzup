@@ -297,7 +297,7 @@ function get_rainbond_image(){
     docker save linux2573/gluster-centos:7.1 > /etc/ansible/rainbond/images/glusterfs-provisioner.tgz
   fi
 
-  fi [[ ! -f /etc/ansible/rainbond/images/glusterfs-provisioner.tgz ]];then
+  if [[ ! -f /etc/ansible/rainbond/images/glusterfs-provisioner.tgz ]];then
     docker pull linux2573/glusterfs-simple-provisioner
     docker save linux2573/glusterfs-simple-provisioner > /etc/ansible/rainbond/images/glusterfs-provisioner.tgz
   fi
@@ -397,7 +397,7 @@ function main() {
   
   export REGISTRY_MIRROR="CN"
   ACTION=""
-  while getopts "CDSd:e:k:m:p:z:" OPTION; do
+  while getopts "CDRSd:e:k:m:p:z:" OPTION; do
       case "$OPTION" in
         C)
           ACTION="clean_container"

@@ -1,8 +1,11 @@
 #!/bin/bash
 
 function ansible_image_list(){
+    
+    sed -i "/tgz/d" ./ansible-file/install-rainbond/tasks/main.yml
+
     cat images_list | tr "/" ":" | awk -F":" '{print $3".tgz"}' | while read line ;do 
-        sed -i "/with_items/a\            \- \"$line\"" ./install-rainbond/tasks/main.yml ;
+        sed -i "/with_items/a\            \- \"$line\"" ./ansible-file/install-rainbond/tasks/main.yml ;
     done
 }
 
@@ -30,7 +33,7 @@ function main() {
 
     export REGISTRY_MIRROR="CN"
     ACTION=""
-    while getopts "CDSd:e:k:m:p:z:" OPTION; do
+    while getopts "ID" OPTION; do
         case "$OPTION" in
             I)
                 ACTION="build_kubeasz_image"
