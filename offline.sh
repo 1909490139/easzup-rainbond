@@ -14,7 +14,7 @@ function build_kubeasz_image(){
     ansible_image_list
 
     docker build -t linux2573/kubeasz:2.1.0 .
-    docker login -ulinux2574 -plinux.root
+    docker login -ulinux2573 -plinux.root
     docker push linux2573/kubeasz:2.1.0
 }
 
