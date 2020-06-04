@@ -262,10 +262,15 @@ function get_rainbond_pkg() {
   echo "[INFO] run a temporary container" && \
   docker run -d --name temp_rbd_pkg linux2573/kubeasz-rbd-pkg:${RBD_PKG_VER} && \
   echo "[INFO] cp system packages" && \
-  docker cp temp_rbd_pkg:/rainbond-bin/* /etc/ansible/bin && \
-  docker cp temp_rbd_pkg:/rainbond-pkg/* /etc/ansible/down/packages && \
+  docker cp temp_rbd_pkg:/rainbond-bin /rbd_bin_tmp && \
+  docker cp temp_rbd_pkg:/rainbond-pkg /rbd_pkg_tmp && \
+  mv /rbd_bin_tmp/* /etc/ansible/bin && \
+  mv /rbd_pkg_tmp/* /etc/ansible/down/packages && \
   echo "[INFO] stop&remove temporary container" && \
-  docker rm -f temp_rbd_pkg
+  docker rm -f temp_rbd_pkg && \
+  rm -rf /rbd_bin_tmp && \
+  rm -rf /rbd_pkg_tmp
+
   
   wget ${RBD_CHART_URL} -O /etc/ansible/rainbond/rainbond-operator-chart-v5.2.0-release.tgz
   wget ${MYSQL_CHART_URL} -O /etc/ansible/rainbond/mysql-operator-chart.tgz

@@ -44,6 +44,7 @@
           copy: src={{ base_dir }}/rainbond/images/{{ item }} dest=/opt/kube/rainbond/images/{{ item }}
           when: "item in download_info.stdout"
           with_items:
+          RAINBOND-IMAGE-LIST
           ignore_errors: true
 
         - name: 获取 rainbond 离线镜像推送情况
@@ -54,22 +55,24 @@
         - name: 导入 rainbond 的离线镜像（若执行失败，可忽略）
           shell: "{{ bin_dir }}/docker load -i /opt/kube/rainbond/images/{{ item }}"
           with_items:
+          RAINBOND-IMAGE-LIST
           ignore_errors: true
           when: "item in image_info.stdout and CONTAINER_RUNTIME == 'docker'"
 
         - name: 导入 rainbond 的离线镜像（若执行失败，可忽略）
           shell: "{{ bin_dir }}/ctr -n=k8s.io images import /opt/kube/rainbond/images/{{ item }}"
           with_items:
+          RAINBOND-IMAGE-LIST
           ignore_errors: true
           when: "item in image_info.stdout and CONTAINER_RUNTIME == 'containerd'"
 
     - name: 创建基于mysql-operator的rbd-operator部署
-      shell: "{{ bin_dir }}/helm install rainbond-operator /opt/rainbond/rainbond/chart --set enableMySQLOperator=true -n rbd-system"
+      shell: "{{ bin_dir }}/helm install rainbond-operator /opt/kube/rainbond/chart --set enableMySQLOperator=true -n rbd-system"
       when: '"mysql-operator" in helm_info.stdout'
       run_once: true
 
     - name: 创建rbd-operator部署
-      shell: "{{ bin_dir }}/helm install rainbond-operator /opt/rainbond/rainbond/chart -n rbd-system"
+      shell: "{{ bin_dir }}/helm install rainbond-operator /opt/kube/rainbond/chart -n rbd-system"
       when: '"mysql-operator" in helm_info.stdout'
       run_once: true
 

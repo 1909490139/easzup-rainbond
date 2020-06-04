@@ -5,8 +5,11 @@ function ansible_image_list(){
     sed -i "/tgz/d" ./ansible-file/install-rainbond/tasks/main.yml
 
     cat images_list | tr "/" ":" | awk -F":" '{print $3".tgz"}' | while read line ;do 
-        sed -i "/with_items/a\            \- \"$line\"" ./ansible-file/install-rainbond/tasks/main.yml ;
+        sed -i "/RAINBOND-IMAGE-LIST/a\            \- \"$line\"" ./ansible-file/install-rainbond/tasks/main.yml ;
     done
+
+    sed -i "/RAINBOND-IMAGE-LIST/d" ./ansible-file/install-rainbond/tasks/main.yml ;
+
 }
 
 function build_kubeasz_image(){
