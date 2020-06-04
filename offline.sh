@@ -2,9 +2,9 @@
 
 function ansible_image_list(){
     
-    sed -i "/tgz/d" ./ansible-file/install-rainbond/tasks/main.yml
+    sed -i "/tar.gz/d" ./ansible-file/install-rainbond/tasks/main.yml
 
-    cat images_list | tr "/" ":" | awk -F":" '{print $3".tgz"}' | while read line ;do 
+    cat images_list | tr "/" ":" | awk -F":" '{print $3".tar.gz"}' | while read line ;do 
         sed -i "/RAINBOND-IMAGE-LIST/a\            \- \"$line\"" ./ansible-file/install-rainbond/tasks/main.yml ;
     done
 

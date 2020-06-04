@@ -27,7 +27,7 @@
 - import_tasks: glusterfs.yml
   when: 'INSTALL_GLUSTERFS == "yes"'
 
-- name: 准备 rainbond-operator 文件
+- name: 准备rainbond-operator文件
   unarchive: src={{ base_dir }}/rainbond/rainbond-operator-chart-v5.2.0-release.tgz dest=/opt/kube/rainbond
 
 
@@ -73,7 +73,6 @@
 
     - name: 创建rbd-operator部署
       shell: "{{ bin_dir }}/helm install rainbond-operator /opt/kube/rainbond/chart -n rbd-system"
-      when: '"mysql-operator" in helm_info.stdout'
       run_once: true
 
   when: 

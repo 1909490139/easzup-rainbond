@@ -283,7 +283,7 @@ function get_rainbond_image(){
   echo -e "[INFO] \033[33mdownloading rainbond offline images\033[0m"
 
   while read image_name;do
-    image_tgz=`echo $image_name| tr "/" ":" | awk -F ":" '{print $3".tgz"}'`
+    image_tgz=`echo $image_name| tr "/" ":" | awk -F ":" '{print $3".tar.gz"}'`
 
     if [[ ! -f /etc/ansible/rainbond/images/${image_tgz} ]];then
       docker pull ${image_name}
@@ -294,17 +294,17 @@ function get_rainbond_image(){
 
   if [[ ! -f /etc/ansible/rainbond/images/mysql-operator.tgz ]];then
     docker pull registry.cn-hangzhou.aliyuncs.com/abewang/mysql-operator:latest
-    docker save registry.cn-hangzhou.aliyuncs.com/abewang/mysql-operator:latest > /etc/ansible/rainbond/images/mysql-operator.tgz
+    docker save registry.cn-hangzhou.aliyuncs.com/abewang/mysql-operator:latest > /etc/ansible/rainbond/images/mysql-operator.tar.gz
   fi
 
   if [[ ! -f /etc/ansible/rainbond/images/glusterfs-provisioner.tgz ]];then
     docker pull linux2573/gluster-centos:7.1
-    docker save linux2573/gluster-centos:7.1 > /etc/ansible/rainbond/images/glusterfs-provisioner.tgz
+    docker save linux2573/gluster-centos:7.1 > /etc/ansible/rainbond/images/glusterfs-provisioner.tar.gz
   fi
 
   if [[ ! -f /etc/ansible/rainbond/images/glusterfs-provisioner.tgz ]];then
     docker pull linux2573/glusterfs-simple-provisioner
-    docker save linux2573/glusterfs-simple-provisioner > /etc/ansible/rainbond/images/glusterfs-provisioner.tgz
+    docker save linux2573/glusterfs-simple-provisioner > /etc/ansible/rainbond/images/glusterfs-provisioner.tar.gz
   fi
 
 }
