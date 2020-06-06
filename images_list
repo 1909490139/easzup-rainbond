@@ -23,5 +23,4 @@ registry.cn-hangzhou.aliyuncs.com/goodrain/etcd:v3.3.18
 registry.cn-hangzhou.aliyuncs.com/goodrain/kube-state-metrics:latest
 registry.cn-hangzhou.aliyuncs.com/goodrain/plugins-tcm:5.1.7
 registry.cn-hangzhou.aliyuncs.com/goodrain/mysqld-exporter:latest
-registry.cn-hangzhou.aliyuncs.com/goodrain/rbd-registry:2.6.2
 registry.cn-hangzhou.aliyuncs.com/goodrain/registry:2.6.2

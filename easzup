@@ -258,6 +258,8 @@ function get_rainbond_pkg() {
     rm -rf /etc/ansible/bin/helm
   fi
 
+  docker ps -a | grep temp_rbd_pkg && docker rm -f temp_rbd_pkg
+
   docker pull linux2573/kubeasz-rbd-pkg:${RBD_PKG_VER} && \
   echo "[INFO] run a temporary container" && \
   docker run -d --name temp_rbd_pkg linux2573/kubeasz-rbd-pkg:${RBD_PKG_VER} && \
@@ -292,17 +294,17 @@ function get_rainbond_image(){
     
   done < ./images_list
 
-  if [[ ! -f /etc/ansible/rainbond/images/mysql-operator.tgz ]];then
+  if [[ ! -f /etc/ansible/rainbond/images/mysql-operator.tar.gz ]];then
     docker pull registry.cn-hangzhou.aliyuncs.com/abewang/mysql-operator:latest
     docker save registry.cn-hangzhou.aliyuncs.com/abewang/mysql-operator:latest > /etc/ansible/rainbond/images/mysql-operator.tar.gz
   fi
 
-  if [[ ! -f /etc/ansible/rainbond/images/glusterfs-provisioner.tgz ]];then
+  if [[ ! -f /etc/ansible/rainbond/images/glusterfs-centos.tar.gz ]];then
     docker pull linux2573/gluster-centos:7.1
-    docker save linux2573/gluster-centos:7.1 > /etc/ansible/rainbond/images/glusterfs-provisioner.tar.gz
+    docker save linux2573/gluster-centos:7.1 > /etc/ansible/rainbond/images/glusterfs-centos.tar.gz
   fi
 
-  if [[ ! -f /etc/ansible/rainbond/images/glusterfs-provisioner.tgz ]];then
+  if [[ ! -f /etc/ansible/rainbond/images/glusterfs-provisioner.tar.gz ]];then
     docker pull linux2573/glusterfs-simple-provisioner
     docker save linux2573/glusterfs-simple-provisioner > /etc/ansible/rainbond/images/glusterfs-provisioner.tar.gz
   fi
