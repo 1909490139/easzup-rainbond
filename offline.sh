@@ -26,6 +26,7 @@ function run_easzup(){
     ./easzup -R
     
 }
+
 function main() {
     # check if use bash shell
     readlink /proc/$$/exe|grep -q "dash" && { echo "[ERROR] you should use bash shell, not sh"; exit 1; }

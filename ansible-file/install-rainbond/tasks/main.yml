@@ -16,7 +16,7 @@
   command: "{{ bin_dir }}/kubectl create namespace rbd-system"
   when: '"rbd-system" not in namespaces_info.stdout'
 
-- name: 获取所有已经创建的POD信息
+- name: 获取所有已经创建的operator信息
   command: "{{ bin_dir }}/helm list -n rbd-system"
   register: helm_info
   run_once: true
@@ -29,6 +29,18 @@
 
 - name: 准备rainbond-operator文件
   unarchive: src={{ base_dir }}/rainbond/rainbond-operator-chart-v5.2.0-release.tgz dest=/opt/kube/rainbond
+
+- name: 准备rainbondcluster文件
+  template: src=rainbondcluster.yaml.j2 dest=/opt/kube/rainbond/rainbondcluster.yaml
+
+- name: 准备rbdcomponent文件
+  template: src=rbdcomponent.yaml.j2 dest=/opt/kube/rainbond/rbdcomponent.yaml
+
+- name: 准备rainbondvolumes文件
+  copy: src=rainbondvolumerwx.yaml dest=/opt/kube/rainbond/rainbondvolumerwx.yaml
+
+- name: 准备rainbondpackage文件
+  copy: src=rainbondpackage.yaml dest=/opt/kube/rainbond/rainbondpackage.yaml
 
 
 # 【可选】推送离线docker 镜像，可以忽略执行错误
@@ -66,15 +78,60 @@
           ignore_errors: true
           when: "item in image_info.stdout and CONTAINER_RUNTIME == 'containerd'"
 
-    - name: 创建基于mysql-operator的rbd-operator部署
-      shell: "{{ bin_dir }}/helm install rainbond-operator /opt/kube/rainbond/chart --set enableMySQLOperator=true -n rbd-system"
-      when: '"mysql-operator" in helm_info.stdout'
-      run_once: true
-
-    - name: 创建rbd-operator部署
-      shell: "{{ bin_dir }}/helm install rainbond-operator /opt/kube/rainbond/chart -n rbd-system"
-      run_once: true
-
   when: 
-  - '"rainbond-operator" not in helm_info.stdout'
+  - 'INSTALL_SOURCE == "offline"'
   ignore_errors: true
+
+- name: 创建基于mysql-operator的rbd-operator部署
+  shell: "{{ bin_dir }}/helm install rainbond-operator /opt/kube/rainbond/chart --set enableMySQLOperator=true -n rbd-system"
+  when: 
+  - '"mysql-operator" in helm_info.stdout'
+  - '"rainbond-operator" not in helm_info.stdout'
+  run_once: true
+
+- name: 创建rbd-operator部署
+  shell: "{{ bin_dir }}/helm install rainbond-operator /opt/kube/rainbond/chart -n rbd-system"
+  - '"rainbond-operator" not in helm_info.stdout'
+  - '"mysql-operator" not in helm_info.stdout'
+  run_once: true
+
+- name: 获取所有已经创建的rainbondcluster信息
+  command: "{{ bin_dir }}/kubectl get rainbondclusters.rainbond.io -n rbd-system"
+  register: rainbondcluster_info
+  run_once: true
+
+- name: 创建rainbondcluster
+  command: "{{ bin_dir }}/kubectl create -f /opt/kube/rainbond/rainbondcluster.yaml"
+  when: '"rainbondcluster" not in rainbondcluster_info'
+  run_once: true
+
+- name: 获取所有已经创建的rbdcomponent信息
+  command: "{{ bin_dir }}/kubectl get rbdcomponents.rainbond.io -n rbd-system"
+  register: rbdcomponent_info
+  run_once: true
+
+- name: 创建rbdcomponent
+  command: "{{ bin_dir }}/kubectl create -f /opt/kube/rainbond/rbdcomponent.yaml"
+  when: '"rbd-worker" not in rbdcomponent_info'
+  run_once: true
+
+- name: 获取所有已经创建的rainbondvolumes信息
+  command: "{{ bin_dir }}/kubectl get rainbondvolumes.rainbond.io -n rbd-system"
+  register: rainbondvolumes_info
+  run_once: true
+
+- name: 创建rainbondvolumes
+  command: "{{ bin_dir }}/kubectl create -f /opt/kube/rainbond/rainbondvolumerwx.yaml"
+  when: '"rainbondvolumerwx" not in rainbondvolumes_info'
+  run_once: true
+
+- name: 获取所有已经创建的rainbondpackages信息
+  command: "{{ bin_dir }}/kubectl get rainbondpackages.rainbond.io -n rbd-system"
+  register: rainbondpackages_info
+  run_once: true
+
+- name: 创建rainbondpackage
+  command: "{{ bin_dir }}/kubectl create -f /opt/kube/rainbond/rainbondpackages.yaml"
+  when: '"rainbondpackage" not in rainbondpackages_info'
+  run_once: true
+

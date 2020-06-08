@@ -2,28 +2,28 @@ apiVersion: rainbond.io/v1alpha1
 kind: RainbondCluster
 metadata:
   annotations:
-    enterprise_id: f77b3f10dc2346a7b55cb43697241439
-    install_id: 992a9aebcf0c4fd6be744c44ea39aac7
+    enterprise_id: {{ EID }}
+    install_id: {{ IID }}
   name: rainbondcluster
   namespace: rbd-system
 spec:
   configCompleted: true
   enableHA: false
   gatewayIngressIPs:
-  - 39.104.148.188
+  - {{ IIP }}
   imageHub:
     domain: goodrain.me
-    password: 6f39e0e3
+    password: IMAGEHUBPASS
     username: admin
   installMode: WithPackage
   installPackageConfig:
     md5: 9ca4afab83272b52b997bcfc2062f1999654c15bbbc2da1fdb1da478fbe77f83
     url: https://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.2/rainbond.images.2020-04-16-v5.2.0-release.tgz
   nodesForChaos:
-  - internalIP: 172.24.205.239
-    name: 172.24.205.239
+  - internalIP: {{ IIP }}
+    name: {{ IIP }}
   nodesForGateway:
-  - internalIP: 172.24.205.239
-    name: 172.24.205.239
+  - internalIP: {{ IIP }}
+    name: {{ IIP }}
   rainbondImageRepository: registry.cn-hangzhou.aliyuncs.com/goodrain
-  suffixHTTPHost: grapps.cn
+  suffixHTTPHost: {{ DOMAIN }}

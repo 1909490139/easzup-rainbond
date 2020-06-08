@@ -138,10 +138,6 @@ function get_kubeasz() {
 
   sed -i 's/dashboard_install: "yes"/dashboard_install: "no"/g' /etc/ansible/roles/cluster-addon/defaults/main.yml
   sed -i 's/ingress_install: "yes"/ingress_install: "no"/g' /etc/ansible/roles/cluster-addon/defaults/main.yml
-  sed -i 's/^INSTALL_SOURCE.*$/INSTALL_SOURCE: "offline"/g' /etc/ansible/roles/chrony/defaults/main.yml
-  sed -i 's/^INSTALL_SOURCE.*$/INSTALL_SOURCE: "offline"/g' /etc/ansible/roles/ex-lb/defaults/main.yml
-  sed -i 's/^INSTALL_SOURCE.*$/INSTALL_SOURCE: "offline"/g' /etc/ansible/roles/kube-node/defaults/main.yml
-  sed -i 's/^INSTALL_SOURCE.*$/INSTALL_SOURCE: "offline"/g' /etc/ansible/roles/prepare/defaults/main.yml
 
  [[ -f "/tmp/docker-${DOCKER_VER}.tgz" ]] && mv "/tmp/docker-${DOCKER_VER}.tgz" /etc/ansible/down
  return 0
@@ -273,10 +269,27 @@ function get_rainbond_pkg() {
   rm -rf /rbd_bin_tmp && \
   rm -rf /rbd_pkg_tmp
 
-  
   wget ${RBD_CHART_URL} -O /etc/ansible/rainbond/rainbond-operator-chart-v5.2.0-release.tgz
   wget ${MYSQL_CHART_URL} -O /etc/ansible/rainbond/mysql-operator-chart.tgz
   wget ${GFS_YAML_URL} -O /etc/ansible/rainbond/gfs-k8s.tgz
+
+  if [[ -f "/etc/ansible/down/docker-${DOCKER_VER}.tgz" ]];then
+    echo "[INFO] docker binaries already existed"
+  else
+    echo -e "[INFO] \033[33mdownloading docker binaries\033[0m $DOCKER_VER"
+    if [[ -e /usr/bin/curl ]];then
+      curl -C- -O --retry 3 "$DOCKER_URL" || { echo "[ERROR] downloading docker failed"; exit 1; }
+    else
+      wget -c "$DOCKER_URL" || { echo "[ERROR] downloading docker failed"; exit 1; }
+    fi
+    mv ./docker-${DOCKER_VER}.tgz /etc/ansible/down
+  fi
+
+  sed -i 's/^INSTALL_SOURCE.*$/INSTALL_SOURCE: "offline"/g' /etc/ansible/roles/chrony/defaults/main.yml
+  sed -i 's/^INSTALL_SOURCE.*$/INSTALL_SOURCE: "offline"/g' /etc/ansible/roles/ex-lb/defaults/main.yml
+  sed -i 's/^INSTALL_SOURCE.*$/INSTALL_SOURCE: "offline"/g' /etc/ansible/roles/kube-node/defaults/main.yml
+  sed -i 's/^INSTALL_SOURCE.*$/INSTALL_SOURCE: "offline"/g' /etc/ansible/roles/prepare/defaults/main.yml
+  sed -i 's/^INSTALL_SOURCE.*$/INSTALL_SOURCE: "offline"/g' /etc/ansible/roles/install-rainbond/defaults/main.yml
 
 }
 
