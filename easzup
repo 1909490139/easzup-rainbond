@@ -273,6 +273,14 @@ function get_rainbond_pkg() {
   wget ${MYSQL_CHART_URL} -O /etc/ansible/rainbond/mysql-operator-chart.tgz
   wget ${GFS_YAML_URL} -O /etc/ansible/rainbond/gfs-k8s.tgz
 
+  if [[ "$REGISTRY_MIRROR" == CN ]];then
+    DOCKER_URL="https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/static/stable/x86_64/docker-${DOCKER_VER}.tgz"
+  else
+    DOCKER_URL="https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VER}.tgz"
+  fi
+
+  mkdir -p /opt/kube/bin /etc/docker /etc/ansible/down
+  
   if [[ -f "/etc/ansible/down/docker-${DOCKER_VER}.tgz" ]];then
     echo "[INFO] docker binaries already existed"
   else
