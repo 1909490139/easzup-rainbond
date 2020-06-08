@@ -365,7 +365,9 @@ function start-aio(){
     AUTH=`pwgen 32 1` && \
     DOMAIN_API="http://domain.grapps.cn" && \
     DOMAIN=`curl -s --connect-timeout 20  -d 'ip='"$HOST_IP"'&uuid='"$DOMAIN_UUID"'&type='"$DOMAIN_TYPE"'&auth='"$AUTH"'' -X POST  $DOMAIN_API/domain/new` && \
-    if [ "$DOMAIN" == *grapps.cn ];then
+    echo $DOMAIN && \
+    if [ "$DOMAIN"=~"*grapps.cn" ];then
+        echo $DOMAIN
         sed -i "s/pass.grapps.cn/$DOMAIN/g" $BASEPATH/roles/install-rainbond/defaults/rainbondcluster.yml
     fi
     
