@@ -341,9 +341,6 @@ function destroy() {
     fi
 }
 
-function config-rainbond(){
-
-}
 function start-aio(){
     checkout aio
     set +u

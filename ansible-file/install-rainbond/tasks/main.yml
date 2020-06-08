@@ -91,6 +91,7 @@
 
 - name: 创建rbd-operator部署
   shell: "{{ bin_dir }}/helm install rainbond-operator /opt/kube/rainbond/chart -n rbd-system"
+  when:
   - '"rainbond-operator" not in helm_info.stdout'
   - '"mysql-operator" not in helm_info.stdout'
   run_once: true
