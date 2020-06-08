@@ -330,7 +330,8 @@ function download_all() {
   get_k8s_bin && \
   get_ext_bin && \
   get_sys_pkg && \
-  get_offline_image
+  get_offline_image && \
+  get_rainbond_pkg
 }
 
 function download_rainbond(){
