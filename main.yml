@@ -132,7 +132,7 @@
   run_once: true
 
 - name: 创建rainbondpackage
-  command: "{{ bin_dir }}/kubectl create -f /opt/kube/rainbond/rainbondpackages.yaml"
+  command: "{{ bin_dir }}/kubectl create -f /opt/kube/rainbond/rainbondpackage.yaml"
   when: '"rainbondpackage" not in rainbondpackages_info'
   run_once: true
 
