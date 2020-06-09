@@ -103,7 +103,9 @@
 
 - name: 创建rainbondcluster
   command: "{{ bin_dir }}/kubectl create -f /opt/kube/rainbond/rainbondcluster.yaml"
-  when: '"rainbondcluster" not in rainbondcluster_info'
+  when: 
+  - '"rainbondcluster" not in rainbondcluster_info'
+  - 'ALL_IN_ONE == "yes"'
   run_once: true
 
 - name: 获取所有已经创建的rbdcomponent信息
@@ -113,7 +115,9 @@
 
 - name: 创建rbdcomponent
   command: "{{ bin_dir }}/kubectl create -f /opt/kube/rainbond/rbdcomponent.yaml"
-  when: '"rbd-worker" not in rbdcomponent_info'
+  when: 
+  - '"rbd-worker" not in rbdcomponent_info'
+  - 'ALL_IN_ONE == "yes"'
   run_once: true
 
 - name: 获取所有已经创建的rainbondvolumes信息
@@ -123,7 +127,9 @@
 
 - name: 创建rainbondvolumes
   command: "{{ bin_dir }}/kubectl create -f /opt/kube/rainbond/rainbondvolumerwx.yaml"
-  when: '"rainbondvolumerwx" not in rainbondvolumes_info'
+  when: 
+  - '"rainbondvolumerwx" not in rainbondvolumes_info'
+  - 'ALL_IN_ONE == "yes"'
   run_once: true
 
 - name: 获取所有已经创建的rainbondpackages信息
@@ -133,6 +139,8 @@
 
 - name: 创建rainbondpackage
   command: "{{ bin_dir }}/kubectl create -f /opt/kube/rainbond/rainbondpackage.yaml"
-  when: '"rainbondpackage" not in rainbondpackages_info'
+  when: 
+  - '"rainbondpackage" not in rainbondpackages_info'
+  - 'ALL_IN_ONE == "yes"'
   run_once: true
 
