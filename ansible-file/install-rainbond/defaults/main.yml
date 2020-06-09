@@ -10,3 +10,8 @@ RBD_VERSION: "v5.2.0-release"
 ALL_IN_ONE: "no"
 #是否离线安装rainbond
 INSTALL_SOURCE: "online"
+#配置rainbondcluster
+EID: "enterprise_id"
+IID: "install_id"
+DOMAIN: "pass.grapps.cn"
+IIP: "192.168.1.1"

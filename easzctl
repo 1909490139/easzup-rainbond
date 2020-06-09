@@ -356,9 +356,9 @@ function start-aio(){
     
     sed -i 's/ALL_IN_ONE: "no"/ALL_IN_ONE: "yes"/g' $BASEPATH/roles/install-rainbond/defaults/main.yml
     
-    sed -i "s/192.168.1.1/$HOST_IP/g" $BASEPATH/roles/install-rainbond/defaults/rainbondcluster.yml
-    EID=`uuidgen | tr -d -` && sed -i "s/enterprise_id/$EID/g" $BASEPATH/roles/install-rainbond/defaults/rainbondcluster.yml
-    IID=`uuidgen | tr -d -` && sed -i "s/install_id/$IID/g" $BASEPATH/roles/install-rainbond/defaults/rainbondcluster.yml
+    sed -i "s/192.168.1.1/$HOST_IP/g" $BASEPATH/roles/install-rainbond/defaults/main.yml
+    EID=`uuidgen | tr -d -` && sed -i "s/enterprise_id/$EID/g" $BASEPATH/roles/install-rainbond/defaults/main.yml
+    IID=`uuidgen | tr -d -` && sed -i "s/install_id/$IID/g" $BASEPATH/roles/install-rainbond/defaults/main.yml
     
     DOMAIN_UUID=`uuidgen` && \
     DOMAIN_TYPE="False" && \
@@ -368,7 +368,7 @@ function start-aio(){
     echo $DOMAIN && \
     if [ "$DOMAIN"=~"*grapps.cn" ];then
         echo $DOMAIN
-        sed -i "s/pass.grapps.cn/$DOMAIN/g" $BASEPATH/roles/install-rainbond/defaults/rainbondcluster.yml
+        sed -i "s/pass.grapps.cn/$DOMAIN/g" $BASEPATH/roles/install-rainbond/defaults/main.yml
     fi
     
     setup
