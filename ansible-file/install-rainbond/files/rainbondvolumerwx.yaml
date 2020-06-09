@@ -11,7 +11,4 @@ spec:
   csiPlugin:
     nfs: {}
   imageRepository: registry.cn-hangzhou.aliyuncs.com/goodrain
-  storageClassName: rainbondvolumerwx
-  storageClassParameters:
-    provisioner: rainbond.io/nfs
   storageRequest: 1
