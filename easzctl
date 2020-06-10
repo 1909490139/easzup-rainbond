@@ -371,8 +371,6 @@ function start-aio(){
         echo $DOMAIN
         sed -i "s/pass.grapps.cn/$DOMAIN/g" $BASEPATH/roles/install-rainbond/defaults/main.yml
     fi
-
-    IMAGEHUBPASS=`pwgen 8 1` && sed -i "s/imagespassword/$IMAGEHUBPASS/g" $BASEPATH/roles/install-rainbond/defaults/main.yml
     
     setup
 }
