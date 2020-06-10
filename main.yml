@@ -24,11 +24,8 @@
 - import_tasks: mysql-operator.yml
   when: 'INSTALL_MYSQL_OPERATOR == "yes"'
 
-- import_tasks: glusterfs.yml
-  when: 'INSTALL_GLUSTERFS == "yes"'
-
 - name: 准备rainbond-operator文件
-  unarchive: src={{ base_dir }}/rainbond/rainbond-operator-chart-v5.2.0-release.tgz dest=/opt/kube/rainbond
+  unarchive: src={{ base_dir }}/rainbond/rainbond-operator-chart.tgz dest=/opt/kube/rainbond
 
 - name: 准备rainbondcluster文件
   template: src=rainbondcluster.yaml.j2 dest=/opt/kube/rainbond/rainbondcluster.yaml

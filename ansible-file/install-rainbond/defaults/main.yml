@@ -1,7 +1,5 @@
 #是否安装Mysql_operator
 INSTALL_MYSQL_OPERATOR: "no"
-#是否安装glusterfs
-INSTALL_GLUSTERFS: "no"
 #rainbond镜像仓库地址
 IMAGE_URL: "registry.cn-hangzhou.aliyuncs.com/goodrain"
 #rainbond镜像版本

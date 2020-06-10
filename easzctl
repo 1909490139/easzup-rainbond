@@ -67,6 +67,7 @@ function process_cmd() {
     echo -e "[INFO] \033[33m$ACTION\033[0m : $CMD"
     $CMD || { echo -e "[ERROR] \033[31mAction failed\033[0m : $CMD"; return 1; }
     echo -e "[INFO] \033[32mAction successed\033[0m : $CMD"
+    echo -e "[INFO] \033[32mVisit http://$HOST_IP:30008 to view the installation progress\033[0m"
 }
 
 ### in-cluster operation functions ##############################

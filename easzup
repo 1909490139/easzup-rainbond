@@ -254,44 +254,9 @@ function get_rainbond_pkg() {
     rm -rf /etc/ansible/bin/helm
   fi
 
-  docker ps -a | grep temp_rbd_pkg && docker rm -f temp_rbd_pkg
-
-  docker pull linux2573/kubeasz-rbd-pkg:${RBD_PKG_VER} && \
-  echo "[INFO] run a temporary container" && \
-  docker run -d --name temp_rbd_pkg linux2573/kubeasz-rbd-pkg:${RBD_PKG_VER} && \
-  echo "[INFO] cp system packages" && \
-  docker cp temp_rbd_pkg:/rainbond-bin /rbd_bin_tmp && \
-  docker cp temp_rbd_pkg:/rainbond-pkg /rbd_pkg_tmp && \
-  mv /rbd_bin_tmp/* /etc/ansible/bin && \
-  mv /rbd_pkg_tmp/* /etc/ansible/down/packages && \
-  echo "[INFO] stop&remove temporary container" && \
-  docker rm -f temp_rbd_pkg && \
-  rm -rf /rbd_bin_tmp && \
-  rm -rf /rbd_pkg_tmp
-
-  wget ${RBD_CHART_URL} -O /etc/ansible/rainbond/rainbond-operator-chart-v5.2.0-release.tgz
+  wget https://goodrain-pkg.oss-cn-shanghai.aliyuncs.com/pkg/helm -O /etc/ansible/bin/helm
+  wget ${RBD_CHART_URL} -O /etc/ansible/rainbond/rainbond-operator-chart.tgz
   wget ${MYSQL_CHART_URL} -O /etc/ansible/rainbond/mysql-operator-chart.tgz
-  wget ${GFS_YAML_URL} -O /etc/ansible/rainbond/gfs-k8s.tgz
-
-  if [[ "$REGISTRY_MIRROR" == CN ]];then
-    DOCKER_URL="https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/static/stable/x86_64/docker-${DOCKER_VER}.tgz"
-  else
-    DOCKER_URL="https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VER}.tgz"
-  fi
-
-  mkdir -p /opt/kube/bin /etc/docker /etc/ansible/down
-  
-  if [[ -f "/etc/ansible/down/docker-${DOCKER_VER}.tgz" ]];then
-    echo "[INFO] docker binaries already existed"
-  else
-    echo -e "[INFO] \033[33mdownloading docker binaries\033[0m $DOCKER_VER"
-    if [[ -e /usr/bin/curl ]];then
-      curl -C- -O --retry 3 "$DOCKER_URL" || { echo "[ERROR] downloading docker failed"; exit 1; }
-    else
-      wget -c "$DOCKER_URL" || { echo "[ERROR] downloading docker failed"; exit 1; }
-    fi
-    mv ./docker-${DOCKER_VER}.tgz /etc/ansible/down
-  fi
 
 }
 
@@ -314,14 +279,24 @@ function get_rainbond_image(){
     docker save registry.cn-hangzhou.aliyuncs.com/abewang/mysql-operator:latest > /etc/ansible/rainbond/images/mysql-operator.tar.gz
   fi
 
-  if [[ ! -f /etc/ansible/rainbond/images/glusterfs-centos.tar.gz ]];then
-    docker pull linux2573/gluster-centos:7.1
-    docker save linux2573/gluster-centos:7.1 > /etc/ansible/rainbond/images/glusterfs-centos.tar.gz
+    if [[ "$REGISTRY_MIRROR" == CN ]];then
+    DOCKER_URL="https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/static/stable/x86_64/docker-${DOCKER_VER}.tgz"
+  else
+    DOCKER_URL="https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VER}.tgz"
   fi
 
-  if [[ ! -f /etc/ansible/rainbond/images/glusterfs-provisioner.tar.gz ]];then
-    docker pull linux2573/glusterfs-simple-provisioner
-    docker save linux2573/glusterfs-simple-provisioner > /etc/ansible/rainbond/images/glusterfs-provisioner.tar.gz
+  mkdir -p /opt/kube/bin /etc/docker /etc/ansible/down
+  
+  if [[ -f "/etc/ansible/down/docker-${DOCKER_VER}.tgz" ]];then
+    echo "[INFO] docker binaries already existed"
+  else
+    echo -e "[INFO] \033[33mdownloading docker binaries\033[0m $DOCKER_VER"
+    if [[ -e /usr/bin/curl ]];then
+      curl -C- -O --retry 3 "$DOCKER_URL" || { echo "[ERROR] downloading docker failed"; exit 1; }
+    else
+      wget -c "$DOCKER_URL" || { echo "[ERROR] downloading docker failed"; exit 1; }
+    fi
+    mv ./docker-${DOCKER_VER}.tgz /etc/ansible/down
   fi
 
   sed -i 's/^INSTALL_SOURCE.*$/INSTALL_SOURCE: "offline"/g' /etc/ansible/roles/chrony/defaults/main.yml
@@ -353,6 +328,17 @@ function download_rainbond(){
   get_rainbond_image
 }
 
+function check_port(){
+    local portlist=(80 443 2379 2380 6060 6443 7070 8080 8443 10250 10254 10255 10257 10259 18080 18081)
+    local check_fail_num=0
+    for port in ${portlist[@]}; do
+        netstat -pantu | awk '{print $4}' | awk -F: '{print $2}' | sort -ru | grep "\b$port\b" && ((check_fail_num+=1)) || sleep 1
+        if [ "$check_fail_num" != 0 ]; then
+            echo -e "[INFO] \033[31mport ${port} is already used, please check port\033[0m" && exit 1
+        fi
+    done
+}
+
 function start_kubeasz_docker() {
   [[ -d "/etc/ansible/roles/kube-node" ]] || { echo "[ERROR] not initialized. try 'easzup -D' first."; exit 1; }
 
@@ -374,6 +360,8 @@ function start_kubeasz_docker() {
     echo "[INFO] create a soft link '/usr/bin/python'"
     ln -s /usr/bin/python3 /usr/bin/python
   fi
+
+  check_port
 
   # 
   docker load -i /etc/ansible/down/kubeasz_${KUBEASZ_VER}.tar
