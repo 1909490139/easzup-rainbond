@@ -19,7 +19,7 @@ function build_kubeasz_image(){
     ansible_image_list
 
     docker build -t linux2573/kubeasz:${KUBEASZ_VER} .
-    docker login -ulinux2573 -plinux.root
+    docker login -ulinux2573 -p
     docker push linux2573/kubeasz:${KUBEASZ_VER}
 }
 
