@@ -27,11 +27,7 @@ function install_docker() {
   systemctl status docker|grep Active|grep -q running && { echo "[WARN] docker is already running."; return 0; }
   systemctl status containerd|grep Active|grep -q running && { echo "[ERROR] containerd is running, unsupported."; exit 1; }
   
-  if [[ "$REGISTRY_MIRROR" == CN ]];then
-    DOCKER_URL="https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/static/stable/x86_64/docker-${DOCKER_VER}.tgz"
-  else
-    DOCKER_URL="https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VER}.tgz"
-  fi
+    DOCKER_URL="https://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/docker/docker-${DOCKER_VER}.tgz"
 
   mkdir -p /opt/kube/bin /etc/docker /etc/ansible/down
   if [[ -f "/etc/ansible/down/docker-${DOCKER_VER}.tgz" ]];then
@@ -263,11 +259,7 @@ function get_rainbond_image(){
     docker save registry.cn-hangzhou.aliyuncs.com/abewang/mysql-operator:latest > /etc/ansible/rainbond/images/mysql-operator.tar.gz
   fi
 
-    if [[ "$REGISTRY_MIRROR" == CN ]];then
-    DOCKER_URL="https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/static/stable/x86_64/docker-${DOCKER_VER}.tgz"
-  else
-    DOCKER_URL="https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VER}.tgz"
-  fi
+  DOCKER_URL="https://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/docker/docker-${DOCKER_VER}.tgz"
 
   mkdir -p /opt/kube/bin /etc/docker /etc/ansible/down
   
