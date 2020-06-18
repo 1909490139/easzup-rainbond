@@ -1,6 +1,6 @@
 #!/bin/bash
 #--------------------------------------------------
-# This script is for: 
+# This script is for:
 # 1. to download the scripts/binaries/images needed for installing a k8s cluster with kubeasz
 # 2. to run kubeasz in a container
 # @author:   gjmzj
@@ -14,7 +14,7 @@ set -o errexit
 #set -o xtrace
 
 # default version, can be overridden by cmd line options
-export DOCKER_VER=18.09.9
+export DOCKER_VER=19.03.5
 export KUBEASZ_VER=2.1.0
 export K8S_BIN_VER=v1.16.2
 export EXT_BIN_VER=0.3.2
@@ -26,8 +26,8 @@ function install_docker() {
   # check if a container runtime is already installed
   systemctl status docker|grep Active|grep -q running && { echo "[WARN] docker is already running."; return 0; }
   systemctl status containerd|grep Active|grep -q running && { echo "[ERROR] containerd is running, unsupported."; exit 1; }
-  
-    DOCKER_URL="https://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/docker/docker-${DOCKER_VER}.tgz"
+
+  DOCKER_URL="https://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/docker/docker-${DOCKER_VER}.tgz"
 
   mkdir -p /opt/kube/bin /etc/docker /etc/ansible/down
   if [[ -f "/etc/ansible/down/docker-${DOCKER_VER}.tgz" ]];then
@@ -44,7 +44,7 @@ function install_docker() {
 
   tar zxf /etc/ansible/down/docker-${DOCKER_VER}.tgz -C /etc/ansible/down && \
   mv /etc/ansible/down/docker/* /opt/kube/bin && \
-  ln -sf /opt/kube/bin/docker /bin/docker 
+  ln -sf /opt/kube/bin/docker /bin/docker
 
   echo "[INFO] generate docker service file"
   cat > /etc/systemd/system/docker.service << EOF
@@ -140,7 +140,7 @@ function get_kubeasz() {
 
 function get_k8s_bin() {
   [[ -f "/etc/ansible/bin/kubelet" ]] && { echo "[WARN] kubernetes binaries existed"; return 0; }
-  
+
   echo -e "[INFO] \033[33mdownloading kubernetes\033[0m $K8S_BIN_VER binaries"
   docker pull easzlab/kubeasz-k8s-bin:${K8S_BIN_VER} && \
   echo "[INFO] run a temporary container" && \
@@ -268,7 +268,7 @@ function get_rainbond_image(){
       docker pull ${image_name}
       docker save ${image_name} > /etc/ansible/rainbond/images/${image_tgz}
     fi
-    
+
   done < ./images_list
 
   if [[ ! -f /etc/ansible/rainbond/images/mysql-operator.tar.gz ]];then
@@ -279,7 +279,7 @@ function get_rainbond_image(){
   DOCKER_URL="https://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/docker/docker-${DOCKER_VER}.tgz"
 
   mkdir -p /opt/kube/bin /etc/docker /etc/ansible/down
-  
+
   if [[ -f "/etc/ansible/down/docker-${DOCKER_VER}.tgz" ]];then
     echo "[INFO] docker binaries already existed"
   else
@@ -336,7 +336,7 @@ function start_kubeasz_docker() {
   [[ -d "/etc/ansible/roles/kube-node" ]] || { echo "[ERROR] not initialized. try 'easzup -D' first."; exit 1; }
 
   # get host's IP
-  host_if=$(ip route|grep default|cut -d' ' -f5)
+  host_if=$(ip route|grep default|cut -d' ' -f5|head -1)
   host_ip=$(ip a|grep "$host_if$"|awk '{print $2}'|cut -d'/' -f1)
   echo "[INFO] get host IP: $host_ip"
 
@@ -356,7 +356,7 @@ function start_kubeasz_docker() {
 
   check_port
 
-  # 
+  #
   docker load -i /etc/ansible/down/kubeasz_${KUBEASZ_VER}.tar
 
   # run kubeasz docker container
@@ -375,8 +375,8 @@ function start_kubeasz_docker() {
 
 function clean_container() {
  echo "[INFO] clean all running containers"
- docker ps -a|awk 'NR>1{print $1}'|xargs docker rm -f 
-} 
+ docker ps -a|awk 'NR>1{print $1}'|xargs docker rm -f
+}
 
 function usage() {
   cat <<EOF
@@ -391,10 +391,10 @@ Usage: easzup [options] [args]
     -m <str>   set docker registry mirrors, default "CN"(used in Mainland,China)
     -p <ver>   set kubeasz-sys-pkg version, default "$SYS_PKG_VER"
     -z <ver>   set kubeasz version, default "$KUBEASZ_VER"
-  
+
 see more at https://github.com/kubeasz/dockerfiles
 EOF
-} 
+}
 
 ### Main Lines ##################################################
 function main() {
@@ -402,9 +402,9 @@ function main() {
   readlink /proc/$$/exe|grep -q "dash" && { echo "[ERROR] you should use bash shell, not sh"; exit 1; }
   # check if use with root
   [[ "$EUID" -ne 0 ]] && { echo "[ERROR] you should run this script as root"; exit 1; }
-  
+
   [[ "$#" -eq 0 ]] && { usage >&2; exit 1; }
-  
+
   export REGISTRY_MIRROR="CN"
   ACTION=""
   while getopts "CDRSd:e:k:m:p:z:" OPTION; do
@@ -445,10 +445,10 @@ function main() {
           ;;
       esac
   done
-  
+
   [[ "$ACTION" == "" ]] && { echo "[ERROR] illegal option"; usage; exit 1; }
-  
-  # excute cmd "$ACTION" 
+
+  # excute cmd "$ACTION"
   echo -e "[INFO] \033[33mAction begin\033[0m : $ACTION"
   ${ACTION} || { echo -e "[ERROR] \033[31mAction failed\033[0m : $ACTION"; return 1; }
   echo -e "[INFO] \033[32mAction successed\033[0m : $ACTION"
