@@ -345,14 +345,27 @@ function check_mem(){
 function check_port(){
     local portlist=(80 443 2379 2380 6060 6443 7070 8080 8443 10250 10254 10255 10257 10259 18080 18081)
     local check_fail_num=0
-    for port in ${portlist[@]}; do
-        ss -h 2&>1 /dev/null && ss -pantu | awk '{print $5}' | awk -F: '{print $2}' | sort -ru | grep "\b$port\b" && ((check_fail_num+=1)) || sleep 1
-        ss -h 2&>1 /dev/null || netstat -h 2&>1 /dev/null && netstat -pantu | awk '{print $4}' | awk -F: '{print $2}' | sort -ru | grep "\b$port\b" && ((check_fail_num+=1)) || sleep 1
-        ss -h 2&>1 /dev/null || netstat -h 2&>1 /dev/null || echo -e "[INFO] \033[31mPlease install ss or netstat command\033[0m" && exit 1
-        if [ "$check_fail_num" != 0 ]; then
-            echo -e "[INFO] \033[31mport ${port} is already used, please check port\033[0m" && exit 1
+    ss -h 2&>1 /dev/null 
+    if [ $? == 0 ];then
+        for port in ${portlist[@]}; do
+            ss -pantu | awk '{print $5}' | awk -F: '{print $2}' | sort -ru | grep "\b$port\b" && ((check_fail_num+=1)) || sleep 1
+            if [ "$check_fail_num" != 0 ]; then
+                echo -e "[INFO] \033[31mport ${port} is already used, please check port\033[0m" && exit 1
+            fi
+        done
+    else
+        netstat -h 2&>1
+        if [ $? == 0 ];then
+            for port in ${portlist[@]}; do
+                netstat -pantu | awk '{print $4}' | awk -F: '{print $2}' | sort -ru | grep "\b$port\b" && ((check_fail_num+=1)) || sleep 1
+                if [ "$check_fail_num" != 0 ]; then
+                    echo -e "[INFO] \033[31mport ${port} is already used, please check port\033[0m" && exit 1
+                fi
+            done
+        else
+            echo -e "[INFO] \033[31mPlease install ss or netstat command\033[0m" && exit 1
         fi
-    done
+    fi
 }
 
 function start_kubeasz_docker() {

@@ -3,7 +3,7 @@ FROM easzlab/kubeasz:2.1.0
 RUN apk update && \
     apk add pwgen util-linux curl
 
-COPY ./ansible-file/* /etc/ansible/
+COPY ./ansible-file/ /etc/ansible/
 
 COPY ./easzup /etc/ansible/tools/easzup
 
