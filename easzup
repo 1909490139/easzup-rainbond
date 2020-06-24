@@ -321,11 +321,34 @@ function download_rainbond(){
   get_rainbond_image
 }
 
+function check_disk(){
+    local disk=$(df -h -B 1g | grep "/$" | awk '{print $2}')
+    if [ ${disk} -le 45 ];then
+      echo -e "[INFO] \033[31mThe disk is recommended to be at least 50GB \033[0m" && exit 1
+    fi
+}
+
+function check_cpu(){
+    local cpu=$(lscpu | awk '/^CPU\(/{print $2}')
+    if [ ${cpu} -lt 2 ];then
+      echo -e "[INFO] \033[31mThe cpu is recommended to be at least 2C \033[0m" && exit 1
+    fi
+}
+
+function check_mem(){
+    local mem=$(free -g|awk '/^Mem/{print $2}')
+    if [ ${mem} -le 7 ];then
+      echo -e "[INFO] \033[31mThe Memory is recommended to be at least 8G \033[0m" && exit 1
+    fi
+}
+
 function check_port(){
     local portlist=(80 443 2379 2380 6060 6443 7070 8080 8443 10250 10254 10255 10257 10259 18080 18081)
     local check_fail_num=0
     for port in ${portlist[@]}; do
-        netstat -pantu | awk '{print $4}' | awk -F: '{print $2}' | sort -ru | grep "\b$port\b" && ((check_fail_num+=1)) || sleep 1
+        ss -h 2&>1 /dev/null && ss -pantu | awk '{print $5}' | awk -F: '{print $2}' | sort -ru | grep "\b$port\b" && ((check_fail_num+=1)) || sleep 1
+        ss -h 2&>1 /dev/null || netstat -h 2&>1 /dev/null && netstat -pantu | awk '{print $4}' | awk -F: '{print $2}' | sort -ru | grep "\b$port\b" && ((check_fail_num+=1)) || sleep 1
+        ss -h 2&>1 /dev/null || netstat -h 2&>1 /dev/null || echo -e "[INFO] \033[31mPlease install ss or netstat command\033[0m" && exit 1
         if [ "$check_fail_num" != 0 ]; then
             echo -e "[INFO] \033[31mport ${port} is already used, please check port\033[0m" && exit 1
         fi
@@ -339,6 +362,11 @@ function start_kubeasz_docker() {
   host_if=$(ip route|grep default|cut -d' ' -f5|head -1)
   host_ip=$(ip a|grep "$host_if$"|awk '{print $2}'|cut -d'/' -f1)
   echo "[INFO] get host IP: $host_ip"
+
+  check_cpu
+  check_mem
+  check_disk
+  check_port
 
   # allow ssh login using key locally
   if [[ ! -e /root/.ssh/id_rsa ]]; then
@@ -354,7 +382,7 @@ function start_kubeasz_docker() {
     ln -s /usr/bin/python3 /usr/bin/python
   fi
 
-  check_port
+  
 
   #
   docker load -i /etc/ansible/down/kubeasz_${KUBEASZ_VER}.tar
