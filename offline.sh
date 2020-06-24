@@ -2,13 +2,13 @@
 
 function ansible_image_list(){
     
-    cp ./main.yml ./ansible-file/install-rainbond/tasks/main.yml
+    cp ./main.yml ./ansible-file/roles/install-rainbond/tasks/main.yml
 
     cat images_list | tr "/" ":" | awk -F":" '{print $3".tar.gz"}' | while read line ;do 
-        sed -i "/RAINBOND-IMAGE-LIST/a\            \- \"$line\"" ./ansible-file/install-rainbond/tasks/main.yml ;
+        sed -i "/RAINBOND-IMAGE-LIST/a\            \- \"$line\"" ./ansible-file/roles/install-rainbond/tasks/main.yml ;
     done
 
-    sed -i "/RAINBOND-IMAGE-LIST/d" ./ansible-file/install-rainbond/tasks/main.yml ;
+    sed -i "/RAINBOND-IMAGE-LIST/d" ./ansible-file/roles/install-rainbond/tasks/main.yml ;
 
 }
 
