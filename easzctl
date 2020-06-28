@@ -6,6 +6,8 @@ set -o nounset
 set -o errexit
 #set -o xtrace
 
+TEST_MODE=true
+
 function usage() {
     cat <<EOF
 Usage: easzctl COMMAND [args]
@@ -295,7 +297,7 @@ function setup() {
     ! (read -t5 -n1 ANS) || { echo "[WARN] setup aborted"; return 1; }
     ansible-playbook $BASEPATH/90.setup.yml || return 1
     sed -i "s/start/kubernetesok/" /tmp/rbd_install_log
-    bash /tmp/rbd_install_log 2&>1 /dev/null
+    ${TEST_MODE} || bash /tmp/rbd_install_log 2&>1 /dev/null
     rm -rf /tmp/rbd_install_log
     save_context
 }
@@ -372,7 +374,7 @@ EOF
     IID=`sed -nr "s/IID: \"(.*)\"/\1/p" /etc/ansible/roles/install-rainbond/defaults/main.yml`
     sed -i "s/IID/${IID}/" /tmp/rbd_install_log
     sed -i "s/EID/${EID}/" /tmp/rbd_install_log
-    bash /tmp/rbd_install_log 2&>1 /dev/null
+    ${TEST_MODE} || bash /tmp/rbd_install_log 2&>1 /dev/null
 
     DOMAIN_UUID=`uuidgen` && \
     DOMAIN_TYPE="False" && \
