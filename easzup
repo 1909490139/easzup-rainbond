@@ -339,7 +339,7 @@ function check_cpu(){
 
 function check_mem(){
     local mem=$(free -g|awk '/^Mem/{print $2}')
-    if [ ${mem} -le 7 ];then
+    if [ ${mem} -lt 7 ];then
       echo -e "[INFO] \033[31mThe Memory is recommended to be at least 8G \033[0m" && exit 1
     fi
 }
