@@ -350,7 +350,7 @@ function check_port(){
     ss -h 2&>1 /dev/null 
     if [ $? == 0 ];then
         for port in ${portlist[@]}; do
-            ss -pantu | awk '{print $5}' | awk -F: '{print $2}' | sort -ru | grep "\b$port\b" && ((check_fail_num+=1)) || sleep 1
+            ss -pantu | awk '{print $5}' | awk -F: '{print $NF}' | sort -ru | grep "\b$port\b" && ((check_fail_num+=1)) || sleep 1
             if [ "$check_fail_num" != 0 ]; then
                 echo -e "[INFO] \033[31mport ${port} is already used, please check port\033[0m" && exit 1
             fi
