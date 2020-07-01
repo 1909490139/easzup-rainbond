@@ -1,3 +1,8 @@
-修改images_list文件或ansible相关文件后，请通过./offline.sh -I构建新的kubeasz镜像
-制作离线包请执行./offline.sh -D
-测试在线安装请使用./easzup命令按照相应的安装文档执行操作
+构建镜像 docker build -t linux2573/kubeasz:onlyk8s .
+推送镜像 docker push linux2573/kubeasz:onlyk8s
+安装k8s 
+```bash
+./easzup -D 
+./easzup -S
+docker exec -it kubeasz easzctl start-aio 
+```
