@@ -14,13 +14,11 @@ function ansible_image_list(){
 
 function build_kubeasz_image(){
 
-    KUBEASZ_VER=2.1.0
+    KUBEASZ_VER=boe
 
     ansible_image_list
 
     docker build -t linux2573/kubeasz:${KUBEASZ_VER} .
-    docker login -ulinux2573 -p
-    docker push linux2573/kubeasz:${KUBEASZ_VER}
 }
 
 function run_easzup(){
