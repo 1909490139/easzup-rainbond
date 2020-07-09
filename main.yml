@@ -27,19 +27,6 @@
 - name: 准备rainbond-operator文件
   unarchive: src={{ base_dir }}/rainbond/rainbond-operator-chart.tgz dest=/opt/kube/rainbond
 
-- name: 准备rainbondcluster文件
-  template: src=rainbondcluster.yaml.j2 dest=/opt/kube/rainbond/rainbondcluster.yaml
-
-- name: 准备rbdcomponent文件
-  template: src=rbdcomponent.yaml.j2 dest=/opt/kube/rainbond/rbdcomponent.yaml
-
-- name: 准备rainbondvolumes文件
-  copy: src=rainbondvolumerwx.yaml dest=/opt/kube/rainbond/rainbondvolumerwx.yaml
-
-- name: 准备rainbondpackage文件
-  copy: src=rainbondpackage.yaml dest=/opt/kube/rainbond/rainbondpackage.yaml
-
-
 # 【可选】推送离线docker 镜像，可以忽略执行错误
 - block:
     - block:
