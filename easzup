@@ -24,8 +24,8 @@ export RBD_CHART_URL=https://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5
 export MYSQL_CHART_URL=https://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.2/mysql-operator-chart.tgz
 function install_docker() {
   # check if a container runtime is already installed
-  systemctl status docker|grep Active|grep -q running && { echo "[WARN] docker is already running."; return 0; }
   systemctl status containerd|grep Active|grep -q running && { echo "[ERROR] containerd is running, unsupported."; exit 1; }
+  systemctl status docker|grep Active|grep -q running && { echo "[WARN] docker is already running."; return 0; }
 
   DOCKER_URL="https://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/docker/docker-${DOCKER_VER}.tgz"
 
@@ -355,6 +355,13 @@ function download_rainbond(){
   get_rainbond_image
 }
 
+function check_nfs(){
+    nfsstat --help 2&>1
+    if [ "$?" = "0" ];then
+      echo -e "[INFO] \033[31mPlease install the NFS client tool \033[0m" && exit 1
+    fi
+}
+
 function check_disk(){
     local disk=$(df -h -B 1g | grep "/$" | awk '{print $2}')
     if [ ${disk} -le 45 ];then
@@ -410,7 +417,7 @@ function start_kubeasz_docker() {
   host_ip=$(ip a|grep "$host_if$"|awk '{print $2}'|cut -d'/' -f1)
   echo "[INFO] get host IP: $host_ip"
 
-  nfsstat --help 2&>1 || echo -e "[INFO] \033[31mPlease install the NFS client tool \033[0m"
+  check_nfs
   check_cpu
   check_mem
   check_disk
