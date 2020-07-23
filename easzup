@@ -24,8 +24,8 @@ export RBD_CHART_URL=https://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5
 export MYSQL_CHART_URL=https://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.2/mysql-operator-chart.tgz
 function install_docker() {
   # check if a container runtime is already installed
-  systemctl status docker|grep Active|grep -q running && { echo "[WARN] docker is already running."; return 0; }
   systemctl status containerd|grep Active|grep -q running && { echo "[ERROR] containerd is running, unsupported."; exit 1; }
+  systemctl status docker|grep Active|grep -q running && { echo "[WARN] docker is already running."; return 0; }
 
   DOCKER_URL="https://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/docker/docker-${DOCKER_VER}.tgz"
 
@@ -270,7 +270,7 @@ function start_kubeasz_docker() {
     ln -s /usr/bin/python3 /usr/bin/python
   fi
 
-  
+
 
   #
   docker load -i /etc/ansible/down/kubeasz_${KUBEASZ_VER}.tar
