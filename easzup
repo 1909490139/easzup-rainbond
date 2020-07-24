@@ -357,7 +357,7 @@ function download_rainbond(){
 
 function check_nfs(){
     nfsstat --help 2&>1
-    if [ "$?" = "0" ];then
+    if [ "$?" != "0" ];then
       echo -e "[INFO] \033[31mPlease install the NFS client tool \033[0m" && exit 1
     fi
 }
