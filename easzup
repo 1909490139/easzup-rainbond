@@ -159,9 +159,9 @@ function get_ext_bin() {
   [[ -f "/etc/ansible/bin/etcdctl" ]] && { echo "[WARN] extral binaries existed"; return 0; }
 
   echo -e "[INFO] \033[33mdownloading extral binaries\033[0m kubeasz-ext-bin:$EXT_BIN_VER"
-  docker pull easzlab/kubeasz-ext-bin:${EXT_BIN_VER} && \
+  docker pull linux2573/kubeasz-ext-bin:${EXT_BIN_VER} && \
   echo "[INFO] run a temporary container" && \
-  docker run -d --name temp_ext_bin easzlab/kubeasz-ext-bin:${EXT_BIN_VER} && \
+  docker run -d --name temp_ext_bin linux2573/kubeasz-ext-bin:${EXT_BIN_VER} && \
   echo "[INFO] cp extral binaries" && \
   docker cp temp_ext_bin:/extra /extra_bin_tmp && \
   mv /extra_bin_tmp/* /etc/ansible/bin && \
