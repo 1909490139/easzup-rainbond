@@ -11,6 +11,7 @@ WorkingDirectory=/var/lib/etcd/
 ExecStart={{ bin_dir }}/etcd \
   --name={{ NODE_NAME }} \
   --quota-backend-bytes=4294967296 \
+  --auto-compaction-retention=1 \
   --cert-file=/etc/etcd/ssl/etcd.pem \
   --key-file=/etc/etcd/ssl/etcd-key.pem \
   --peer-cert-file=/etc/etcd/ssl/etcd.pem \
