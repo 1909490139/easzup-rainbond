@@ -6,7 +6,7 @@ set -o nounset
 set -o errexit
 #set -o xtrace
 
-TEST_MODE=true
+TEST_MODE=false
 
 function usage() {
     cat <<EOF
@@ -360,6 +360,7 @@ function start-aio(){
     cp -f $BASEPATH/example/hosts.allinone $BASEPATH/hosts
     sed -i "s/192.168.1.1/$HOST_IP/g" $BASEPATH/hosts
 
+    
     sed -i 's#ALL_IN_ONE: "no"#ALL_IN_ONE: "yes"#g' $BASEPATH/roles/install-rainbond/defaults/main.yml
 
     sed -i "s#192.168.1.1#$HOST_IP#g" $BASEPATH/roles/install-rainbond/defaults/main.yml
