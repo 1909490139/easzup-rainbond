@@ -360,7 +360,7 @@ function start-aio(){
     cp -f $BASEPATH/example/hosts.allinone $BASEPATH/hosts
     sed -i "s/192.168.1.1/$HOST_IP/g" $BASEPATH/hosts
 
-    ansible all -m ping > /dev/null 2&>1 || if true ;then -e "[INFO] \033[31mMake sure $HOST_IP can be reached over ssh \033[0m && exit 1;fi
+    ansible all -m ping > /dev/null 2>&1 || if true ;then echo -e "[INFO] \033[31mMake sure $HOST_IP can be reached over ssh \033[0m "&& exit 1;fi
 
     sed -i 's#ALL_IN_ONE: "no"#ALL_IN_ONE: "yes"#g' $BASEPATH/roles/install-rainbond/defaults/main.yml
 

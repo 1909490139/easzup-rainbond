@@ -18,9 +18,9 @@ function build_kubeasz_image(){
 
     ansible_image_list
 
-    docker build -t linux2573/kubeasz:${KUBEASZ_VER} .
-    docker login -ulinux2573 -p
-    docker push linux2573/kubeasz:${KUBEASZ_VER}
+    docker build -t registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz:${KUBEASZ_VER} .
+    docker login  --username=lius@goodrain registry.cn-hangzhou.aliyuncs.com
+    docker push registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz:${KUBEASZ_VER}
 }
 
 function run_easzup(){
