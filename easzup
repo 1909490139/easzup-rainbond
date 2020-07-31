@@ -123,7 +123,7 @@ function get_kubeasz() {
 
   echo -e "[INFO] \033[33mdownloading kubeasz\033[0m $KUBEASZ_VER"
   echo "[INFO] run a temporary container"
-  docker run -d --name temp_easz linux2573/kubeasz:${KUBEASZ_VER} || { echo "[ERROR] download failed."; exit 1; }
+  docker run -d --name temp_easz registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz:${KUBEASZ_VER} || { echo "[ERROR] download failed."; exit 1; }
 
   [[ -f "/etc/ansible/down/docker-${DOCKER_VER}.tgz" ]] && mv "/etc/ansible/down/docker-${DOCKER_VER}.tgz" /tmp
 
@@ -159,9 +159,9 @@ function get_ext_bin() {
   [[ -f "/etc/ansible/bin/etcdctl" ]] && { echo "[WARN] extral binaries existed"; return 0; }
 
   echo -e "[INFO] \033[33mdownloading extral binaries\033[0m kubeasz-ext-bin:$EXT_BIN_VER"
-  docker pull linux2573/kubeasz-ext-bin:${EXT_BIN_VER} && \
+  docker pull registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz-ext-bin:${EXT_BIN_VER} && \
   echo "[INFO] run a temporary container" && \
-  docker run -d --name temp_ext_bin linux2573/kubeasz-ext-bin:${EXT_BIN_VER} && \
+  docker run -d --name temp_ext_bin registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz-ext-bin:${EXT_BIN_VER} && \
   echo "[INFO] cp extral binaries" && \
   docker cp temp_ext_bin:/extra /extra_bin_tmp && \
   mv /extra_bin_tmp/* /etc/ansible/bin && \
@@ -234,8 +234,8 @@ function get_offline_image() {
     docker save -o ${imageDir}/traefik_${traefikVer}.tar traefik:${traefikVer}
   fi
   if [[ ! -f "$imageDir/kubeasz_$KUBEASZ_VER.tar" ]];then
-    docker pull linux2573/kubeasz:${KUBEASZ_VER} && \
-    docker save -o ${imageDir}/kubeasz_${KUBEASZ_VER}.tar linux2573/kubeasz:${KUBEASZ_VER}
+    docker pull registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz:${KUBEASZ_VER} && \
+    docker save -o ${imageDir}/kubeasz_${KUBEASZ_VER}.tar registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz:${KUBEASZ_VER}
   fi
 }
 
@@ -453,7 +453,7 @@ function start_kubeasz_docker() {
       --volume /root/.ssh/id_rsa:/root/.ssh/id_rsa:ro \
       --volume /root/.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub:ro \
       --volume /root/.ssh/known_hosts:/root/.ssh/known_hosts:ro \
-      linux2573/kubeasz:${KUBEASZ_VER} sleep 36000
+      registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz:${KUBEASZ_VER} sleep 36000
 }
 
 function clean_container() {
