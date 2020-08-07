@@ -14,7 +14,7 @@ function ansible_image_list(){
 
 function build_kubeasz_image(){
 
-    KUBEASZ_VER=2.1.0
+    KUBEASZ_VER=2.1.1
 
     ansible_image_list
 
