@@ -19,7 +19,7 @@ function build_kubeasz_image(){
     ansible_image_list
 
     docker build -t registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz:${KUBEASZ_VER} .
-    docker login  --username=lius@goodrain registry.cn-hangzhou.aliyuncs.com -p${HUBPASS}
+    docker login  --username=lius@goodrain --password=${HUBPASS} registry.cn-hangzhou.aliyuncs.com -p${HUBPASS}
     docker push registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz:${KUBEASZ_VER}
 }
 
