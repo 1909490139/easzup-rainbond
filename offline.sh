@@ -25,8 +25,8 @@ function build_kubeasz_image(){
 
 function run_easzup(){
 
-    ./easzup -R
-    
+    ./easzup -R && echo -e "[INFO] \033[33mdownload successful\033[0m"
+    cd /etc/ansible && tar zcvf rainbond-offline.tgz ./* && echo -e "[INFO] \033[33mtar successful\033[0m"
 }
 
 function main() {
