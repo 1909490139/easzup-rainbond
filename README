@@ -1,8 +1,2 @@
-构建镜像 docker build -t linux2573/kubeasz:onlyk8s .
-推送镜像 docker push linux2573/kubeasz:onlyk8s
-安装k8s 
-```bash
-./easzup -D 
-./easzup -S
-docker exec -it kubeasz easzctl start-aio 
-```
+构建kubeasz:onlyk8s镜像
+docker build -t registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz:onlyk8s
