@@ -24,8 +24,13 @@ export RBD_CHART_URL=https://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5
 function install_docker() {
   # check if a container runtime is already installed
   systemctl status containerd|grep Active|grep -q running && { echo "[ERROR] containerd is running, unsupported."; exit 1; }
-  systemctl status docker|grep Active|grep -q running && { echo "[WARN] docker is already running."; return 0; }
-
+  systemctl status docker|grep Active|grep -q running && DOCKER_VERSION=$(docker version|grep Version|tr -s [:blank:] "."|awk -F"." 'NR==2{print $3}')
+  if [ "${DOCKER_VERSION}" -ge 19 ];then
+    echo "[WARN] docker is already running."; return 0;
+  else
+    echo -e  "\033[31m[WARN] docker version should be greater than 19.x\033[0m" ; exit 1;
+  fi
+  
   DOCKER_URL="https://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/docker/docker-${DOCKER_VER}.tgz"
 
   mkdir -p /opt/kube/bin /etc/docker /etc/ansible/down
