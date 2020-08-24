@@ -1,0 +1,70 @@
+- name: 准备离线安装包目录
+  file: path={{ item }} state=directory
+  whit_items:
+    - /opt/kube/packages/glusterfs
+    - /opt/kube/glusterfs
+
+- block:
+  - name: 分发 glusterfs_centos7 离线包
+    copy:
+      src: "{{ base_dir }}/down/packages/glusterfs_centos7.tar.gz"
+      dest: "/opt/kube/packages/glusterfs/glusterfs_centos7.tar.gz"
+
+  - name: 安装 glusterfs_centos7 离线包
+    shell: 'cd /opt/kube/packages/glusterfs && tar zxf glusterfs_centos7.tar.gz && \
+           rpm -Uvh --force --nodeps *.rpm > /tmp/install_glusterfs.log 2>&1'
+  when:
+  - 'ansible_distribution == "CentOS"'
+  - 'ansible_distribution_major_version == "7"'
+  ignore_errors: true
+
+- name: 准备 glusterfs rbac 文件
+  copy: src=rbac.yaml dest=/opt/kube/glusterfs/rbac.yaml
+
+- name: 准备 glusterfs daemonset 文件
+  copy: src=gluster-daemonset.yaml dest=/opt/kube/glusterfs/gluster-daemonset.yaml
+
+- name: 准备 glusterfs deployment 文件
+  copy: src=deployment.yaml dest=/opt/kube/glusterfs/deployment.yaml
+
+- name: 准备 glusterfs storageclass 文件
+  template: src=storageclass.yaml.j2 dest=/opt/kube/glusterfs/storageclass.yaml
+
+- name: 获取所有已经创建的 clusterrole 信息
+  command: "{{ bin_dir }}/kubectl get clusterrolebinding"
+  register: glustercluster_info
+  run_once: true
+
+- name: 创建 glusterfs clusterrole
+  command: "{{ bin_dir }}/kubectl apply -f /opt/kube/glusterfs/rbac.yaml"
+  when: 
+  - '"run-glfs-provisioner" not in glustercluster_info'
+  run_once: true
+
+- name: 获取所有已经创建的 pod 信息
+  command: "{{ bin_dir }}/kubectl get pod"
+  register: glusterpod_info
+  run_once: true
+
+- name: 创建 glusterfs daemonset 
+  command: "{{ bin_dir }}/kubectl apply -f /opt/kube/glusterfs/gluster-daemonset.yaml"
+  when: 
+  - '"glusterfs" not in glusterpod_info'
+  run_once: true
+
+- name: 创建 glusterfs deploymont
+  command: "{{ bin_dir }}/kubectl apply -f /opt/kube/glusterfs/deployment.yaml"
+  when:
+  - '"glusterfs-simple-provisioner" not in glusterpod_info'
+  run_once: true
+
+- name: 获取所有已经创建的 pod 信息
+  command: "{{ bin_dir }}/kubectl get storageclass"
+  register: storageclass_info
+  run_once: true
+
+- name: 创建 glusterfs storageclass
+  command: "{{ bin_dir }}/kubectl apply -f /opt/kube/glusterfs/storageclass.yaml"
+  when:
+  - '"glusterfs-simple" not in storageclass_info'
+  run_once: true

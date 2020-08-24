@@ -10,5 +10,11 @@ INSTALL_SOURCE: "online"
 EID: "enterprise_id"
 IID: "install_id"
 DOMAIN: "pass.grapps.cn"
+#公网IP地址
+EIP: "192.168.1.1"
+#内网IP地址
 IIP: "192.168.1.1"
-IMAGEHUBPASS: "imagespassword"
+#glusterfs集群
+GFS1: "gfs1_ip"
+GFS2: "gfs2_ip"
+GFS3: "gfs3_ip"

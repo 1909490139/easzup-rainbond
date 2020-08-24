@@ -178,9 +178,9 @@ function get_sys_pkg() {
   [[ -f "/etc/ansible/down/packages/chrony_xenial.tar.gz" ]] && { echo "[WARN] system packages existed"; return 0; }
 
   echo -e "[INFO] \033[33mdownloading system packages\033[0m kubeasz-sys-pkg:$SYS_PKG_VER"
-  docker pull easzlab/kubeasz-sys-pkg:${SYS_PKG_VER} && \
+  docker pull registry.cn-huhehaote.aliyuncs.com/linux2573/kubeasz-sys-pkg${SYS_PKG_VER} && \
   echo "[INFO] run a temporary container" && \
-  docker run -d --name temp_sys_pkg easzlab/kubeasz-sys-pkg:${SYS_PKG_VER} && \
+  docker run -d --name temp_sys_pkg registry.cn-huhehaote.aliyuncs.com/linux2573/kubeasz-sys-pkg:${SYS_PKG_VER} && \
   echo "[INFO] cp system packages" && \
   docker cp temp_sys_pkg:/packages /etc/ansible/down && \
   echo "[INFO] stop&remove temporary container" && \
@@ -310,9 +310,14 @@ function get_rainbond_image(){
 
   done < ./images_list
 
-  if [[ ! -f /etc/ansible/rainbond/images/mysql-operator.tar.gz ]];then
-    docker pull registry.cn-hangzhou.aliyuncs.com/abewang/mysql-operator:latest
-    docker save registry.cn-hangzhou.aliyuncs.com/abewang/mysql-operator:latest > /etc/ansible/rainbond/images/mysql-operator.tar.gz
+  if [[ ! -f "/etc/ansible/rainbond/images/gfs-provisioner.tar.gz" ]];then
+    docker pull quay.io/external_storage/glusterfs-simple-provisioner:latest
+    docker save quay.io/external_storage/glusterfs-simple-provisioner:latest /etc/ansible/rainbond/images/gfs-provisioner.tar.gz
+  fi
+
+  if [[ ! -f /etc/ansible/rainbond/images/gluster.tar.gz ]];then
+    docker pull gluster/gluster-centos:latest
+    docker save gluster/gluster-centos:latest > /etc/ansible/rainbond/images/gluster.tar.gz
   fi
 
   DOCKER_URL="https://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/docker/docker-${DOCKER_VER}.tgz"
