@@ -15,6 +15,7 @@
 - name: 创建 namespace rbd-system
   command: "{{ bin_dir }}/kubectl create namespace rbd-system"
   when: '"rbd-system" not in namespaces_info.stdout'
+  run_once: true
 
 - name: 获取所有已经创建的operator信息
   command: "{{ bin_dir }}/helm list -n rbd-system"

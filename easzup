@@ -315,7 +315,7 @@ function get_rainbond_image(){
 
   if [[ ! -f "/etc/ansible/rainbond/images/gfs-provisioner.tar.gz" ]];then
     docker pull quay.io/external_storage/glusterfs-simple-provisioner:latest
-    docker save quay.io/external_storage/glusterfs-simple-provisioner:latest /etc/ansible/rainbond/images/gfs-provisioner.tar.gz
+    docker save quay.io/external_storage/glusterfs-simple-provisioner:latest > /etc/ansible/rainbond/images/gfs-provisioner.tar.gz
   fi
 
   if [[ ! -f /etc/ansible/rainbond/images/gluster.tar.gz ]];then
