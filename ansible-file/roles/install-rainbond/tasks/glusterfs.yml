@@ -1,6 +1,6 @@
 - name: 准备离线安装包目录
   file: path={{ item }} state=directory
-  whit_items:
+  with_items:
     - /opt/kube/packages/glusterfs
     - /opt/kube/glusterfs
 
@@ -52,7 +52,8 @@
 - name: 导入 rainbond 的离线镜像（若执行失败，可忽略）
   shell: "{{ bin_dir }}/ctr -n=k8s.io images import /opt/kube/rainbond/images/{{ item }}"
   with_items:
-  RAINBOND-IMAGE-LIST
+  - gfs-provisioner.tar.gz
+  - gluster.tar.gz
   ignore_errors: true
   when: "item in image_info.stdout and CONTAINER_RUNTIME == 'containerd'"
 
@@ -95,7 +96,7 @@
   run_once: true
 
 - name: 等待 glusterfs1 运行，视下载镜像速度而定
-  shell: "{{ bin_dir }}/kubectl get pod -n kube-system -o wide|grep 'glusterfs'|grep '{{ GFS1 }}'|awk '{print $2}'"
+  shell: "{{ bin_dir }}/kubectl get pod -o wide|grep 'glusterfs'|grep '{{ GFS1 }}'|awk '{print $2}'"
   register: pod_status
   until: pod_status.stdout == "1/1"
   retries: 15
@@ -103,7 +104,7 @@
   ignore_errors: true
 
 - name: 轮询等待 glusterfs2 运行，视下载镜像速度而定
-  shell: "{{ bin_dir }}/kubectl get pod -n kube-system -o wide|grep 'glusterfs'|grep '{{ GFS2 }}'|awk '{print $2}'"
+  shell: "{{ bin_dir }}/kubectl get pod -o wide|grep 'glusterfs'|grep '{{ GFS2 }}'|awk '{print $2}'"
   register: pod_status
   until: pod_status.stdout == "1/1"
   retries: 15
@@ -111,7 +112,7 @@
   ignore_errors: true
 
 - name: 轮询等待 glusterfs3 运行，视下载镜像速度而定
-  shell: "{{ bin_dir }}/kubectl get pod -n kube-system -o wide|grep 'glusterfs'|grep '{{ GFS3 }}'|awk '{print $2}'"
+  shell: "{{ bin_dir }}/kubectl get pod -o wide|grep 'glusterfs'|grep '{{ GFS3 }}'|awk '{print $2}'"
   register: pod_status
   until: pod_status.stdout == "1/1"
   retries: 15
