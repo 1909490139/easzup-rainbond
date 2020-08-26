@@ -29,6 +29,8 @@ function build_kubeasz_image(){
     docker build -t registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz:${KUBEASZ_VER} .
     docker login  --username=lius@goodrain --password=${HUBPASS} registry.cn-hangzhou.aliyuncs.com
     docker push registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz:${KUBEASZ_VER}
+    docker logout registry.cn-hangzhou.aliyuncs.com
+    
 }
 
 function run_easzup(){
