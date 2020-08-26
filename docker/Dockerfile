@@ -4,7 +4,7 @@ RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/" /etc/apk/repositories 
     apk update && \
     apk add pwgen util-linux curl
 
-COPY ../ansible-file/ /etc/ansible/
+COPY ./ansible-file/ /etc/ansible/
 
 COPY ./easzup /etc/ansible/tools/easzup
 
