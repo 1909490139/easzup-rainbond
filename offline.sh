@@ -11,7 +11,7 @@ function ansible_image_list(){
     done
 
     cat images_list | tr "/" ":" | awk -F":" '{print $3".tar.gz"}' | while read line ;do 
-        sed -i "/RAINBOND-IMAGE-LIST/a\    \- \"$line\"" ./ansible-file/*.yml ;
+        sed -i "/RAINBOND-IMAGE-LIST/a\    \- \"$line\"" ./ansible-file/tools/*.yml ;
     done
 
     sed -i "/RAINBOND-IMAGE-LIST/d" ./ansible-file/roles/install-rainbond/tasks/*.yml ;
@@ -26,7 +26,7 @@ function build_kubeasz_image(){
 
     ansible_image_list
 
-    docker build -t registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz:${KUBEASZ_VER} .
+    docker build -t registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz:${KUBEASZ_VER} ./docker
     docker login  --username=lius@goodrain --password=${HUBPASS} registry.cn-hangzhou.aliyuncs.com
     docker push registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz:${KUBEASZ_VER}
 }
