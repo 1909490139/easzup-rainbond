@@ -461,6 +461,7 @@ function start_kubeasz_docker() {
       --name kubeasz \
       --restart always \
       --env HOST_IP="$host_ip" \
+      --env EIP="$EIP" \
       --volume /etc/ansible:/etc/ansible \
       --volume /root/.kube:/root/.kube \
       --volume /root/.ssh/id_rsa:/root/.ssh/id_rsa:ro \

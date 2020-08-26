@@ -11,7 +11,7 @@ EID: "enterprise_id"
 IID: "install_id"
 DOMAIN: "pass.grapps.cn"
 #公网IP地址
-EIP: "192.168.1.1"
+EIP: "RBD_EIP"
 #内网IP地址
 IIP: "192.168.1.1"
 #glusterfs集群
