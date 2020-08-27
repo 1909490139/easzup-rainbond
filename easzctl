@@ -296,8 +296,8 @@ function setup() {
     echo -e "[INFO] setup begin in 5s, press any key to abort\n:"
     ! (read -t5 -n1 ANS) || { echo "[WARN] setup aborted"; return 1; }
     ansible-playbook $BASEPATH/90.setup.yml || return 1
-    sed -i "s/startk8s/kubernetesok/" /tmp/rbd_install_log
-    ${TEST_MODE} || bash /tmp/rbd_install_log > /dev/null 2&>1
+    sed -i "s/startk8s/k8sok/" /tmp/rbd_install_log
+    ${TEST_MODE} || bash /tmp/rbd_install_log > /dev/null 2>&1
     rm -rf /tmp/rbd_install_log
     save_context
 }
@@ -366,6 +366,7 @@ function start-aio(){
 
     sed -i "s#192.168.1.1#$HOST_IP#g" $BASEPATH/roles/install-rainbond/defaults/main.yml
     
+    if [ -n $EIP ];then EIP=$HOST_IP;fi
     sed -i "s#RBD_EIP#$EIP#g" $BASEPATH/roles/install-rainbond/defaults/main.yml
 
     EID=`uuidgen | tr -d -` && sed -i "s#enterprise_id#$EID#g" $BASEPATH/roles/install-rainbond/defaults/main.yml
@@ -379,7 +380,7 @@ EOF
     IID=`sed -nr "s#IID: \"(.*)\"#\1#p" /etc/ansible/roles/install-rainbond/defaults/main.yml`
     sed -i "s#IID#${IID}#" /tmp/rbd_install_log
     sed -i "s#EID#${EID}#" /tmp/rbd_install_log
-    ${TEST_MODE} || bash /tmp/rbd_install_log > /dev/null 2&>1
+    ${TEST_MODE} || bash /tmp/rbd_install_log > /dev/null 2>&1
 
     DOMAIN_UUID=`uuidgen` && \
     DOMAIN_TYPE="False" && \
