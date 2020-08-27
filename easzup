@@ -314,13 +314,13 @@ function get_rainbond_image(){
   done < ./images_list
 
   if [[ ! -f "/etc/ansible/rainbond/images/gfs-provisioner.tar.gz" ]];then
-    docker pull quay.io/external_storage/glusterfs-simple-provisioner:latest
-    docker save quay.io/external_storage/glusterfs-simple-provisioner:latest > /etc/ansible/rainbond/images/gfs-provisioner.tar.gz
+    docker pull registry.cn-huhehaote.aliyuncs.com/linux2573/glusterfs-simple-provisioner:latest
+    docker save registry.cn-huhehaote.aliyuncs.com/linux2573/glusterfs-simple-provisioner:latest > /etc/ansible/rainbond/images/gfs-provisioner.tar.gz
   fi
 
   if [[ ! -f /etc/ansible/rainbond/images/gluster.tar.gz ]];then
-    docker pull gluster/gluster-centos:latest
-    docker save gluster/gluster-centos:latest > /etc/ansible/rainbond/images/gluster.tar.gz
+    docker pull registry.cn-huhehaote.aliyuncs.com/linux2573/gluster-centos:latest
+    docker save registry.cn-huhehaote.aliyuncs.com/linux2573/gluster-centos:latest > /etc/ansible/rainbond/images/gluster.tar.gz
   fi
 
   DOCKER_URL="https://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/docker/docker-${DOCKER_VER}.tgz"
