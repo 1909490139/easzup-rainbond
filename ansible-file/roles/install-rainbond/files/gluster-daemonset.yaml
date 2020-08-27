@@ -30,7 +30,7 @@ spec:
       - env:
         - name: TZ
           value: Asia/Shanghai
-        image: gluster/gluster-centos:latest
+        image: registry.cn-huhehaote.aliyuncs.com/linux2573/gluster-centos:latest
         imagePullPolicy: IfNotPresent
         name: glusterfs
         volumeMounts:

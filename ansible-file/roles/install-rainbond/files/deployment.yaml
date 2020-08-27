@@ -16,6 +16,6 @@ spec:
     spec:
       serviceAccount: glfs-provisioner
       containers:
-        - image: "quay.io/external_storage/glusterfs-simple-provisioner:latest"
+        - image: "registry.cn-huhehaote.aliyuncs.com/linux2573/glusterfs-simple-provisioner/glusterfs-simple-provisioner:latest"
           imagePullPolicy: IfNotPresent
           name: glusterfs-simple-provisioner
