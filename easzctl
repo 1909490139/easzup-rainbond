@@ -366,7 +366,7 @@ function start-aio(){
 
     sed -i "s#192.168.1.1#$HOST_IP#g" $BASEPATH/roles/install-rainbond/defaults/main.yml
     
-    if [ -n $EIP ];then EIP=$HOST_IP;fi
+    if [ ! -n "$EIP" ];then EIP=$HOST_IP;fi
     sed -i "s#RBD_EIP#$EIP#g" $BASEPATH/roles/install-rainbond/defaults/main.yml
 
     EID=`uuidgen | tr -d -` && sed -i "s#enterprise_id#$EID#g" $BASEPATH/roles/install-rainbond/defaults/main.yml
