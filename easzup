@@ -368,13 +368,6 @@ function download_rainbond(){
   get_rainbond_image
 }
 
-function check_nfs(){
-    nfsstat --help > /dev/null 2>&1
-    if [ "$?" != "0" ];then
-      echo -e "[INFO] \033[31mPlease install the NFS client tool \033[0m" && exit 1
-    fi
-}
-
 function check_disk(){
     local disk=$(df -h -B 1g | grep "/$" | awk '{print $2}')
     if [ ${disk} -le 45 ];then
@@ -430,7 +423,6 @@ function start_kubeasz_docker() {
   host_ip=$(ip a|grep "$host_if$"|awk '{print $2}'|cut -d'/' -f1)
   echo "[INFO] get host IP: $host_ip"
 
-  check_nfs
   check_cpu
   check_mem
   check_disk
