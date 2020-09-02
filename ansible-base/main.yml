@@ -70,12 +70,14 @@
   - 'ALL_IN_ONE == "yes"'
   ignore_errors: true
 
+- import_tasks: keepalived.yml
+  when:
+  - 'ALL_IN_ONE == "no"'
+  - 'INSTALL_SOURCE == "offline"'
+  
 - import_tasks: glusterfs.yml
   when: 
   - 'ALL_IN_ONE == "no"'
   - 'INSTALL_SOURCE == "offline"'
 
-- import_tasks: keepalived.yml
-  when:
-  - 'ALL_IN_ONE == "no"'
-  - 'INSTALL_SOURCE == "offline"'
+

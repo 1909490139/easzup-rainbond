@@ -127,11 +127,13 @@
 - name: 添加 glusterfs 集群节点1
   shell: "{{ bin_dir }}/kubectl exec -ti {{ glusterfs1.stdout}} gluster peer probe {{ GFS2 }}"
   run_once: true
+  ignore_errors: true
 
 - name: 添加 glusterfs 集群节点2
   shell: "{{ bin_dir }}/kubectl exec -ti {{ glusterfs1.stdout}} gluster peer probe {{ GFS3 }}"
   run_once: true
-
+  ignore_errors: true
+  
 - name: 创建 glusterfs deploymont
   command: "{{ bin_dir }}/kubectl apply -f /opt/kube/glusterfs/deployment.yaml"
   when:
