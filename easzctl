@@ -7,6 +7,7 @@ set -o errexit
 #set -o xtrace
 
 TEST_MODE=false
+ITYPE=`sed -nr "s#INSTALL_SOURCE: \"(.*)\"#\1#p" /etc/ansible/roles/install-rainbond/defaults/main.yml`
 
 function usage() {
     cat <<EOF
@@ -295,7 +296,17 @@ function setup() {
     echo -e "\n[INFO] setup cluster with context: $CLUSTER"
     echo -e "[INFO] setup begin in 5s, press any key to abort\n:"
     ! (read -t5 -n1 ANS) || { echo "[WARN] setup aborted"; return 1; }
-    ansible-playbook $BASEPATH/90.setup.yml || return 1
+    ansible-playbook $BASEPATH/90.setup.yml
+    
+    if [ "$?" != "0" ];then                                                                 
+        MESSAGE=`tail -n 5 /var/log/ansible.log | grep -B 1 FAILED! |tr -d "\"|\||\n" | tr -s "*| "`
+        cat > /tmp/rbd_install_log <<EOF                            
+curl -H "Content-Type:application/json" -X POST --data '{"install_id": "$IID","eid": "$EID", "version": "v5.2.1-release", "install_source": "${ITYPE}k8s", "status": "sta
+EOF
+        bash /tmp/rbd_install_log > /dev/null 2>&1
+        echo > /var/log/ansible.log && exit 1
+    fi 
+    
     sed -i "s/startk8s/k8sok/" /tmp/rbd_install_log
     ${TEST_MODE} || bash /tmp/rbd_install_log > /dev/null 2>&1
     rm -rf /tmp/rbd_install_log
@@ -372,16 +383,13 @@ function start-aio(){
     EID=`uuidgen | tr -d -` && sed -i "s#enterprise_id#$EID#g" $BASEPATH/roles/install-rainbond/defaults/main.yml
     IID=`uuidgen | tr -d -` && sed -i "s#install_id#$IID#g" $BASEPATH/roles/install-rainbond/defaults/main.yml
 
-    cat > /tmp/rbd_install_log <<EOF
-curl -H "Content-Type:application/json" -X POST --data '{"install_id": "IID","eid": "EID", "version": "v5.2.1-release", "install_source": "ITYPEk8s", "status": "startk8s", "message": "", "is_uninstall": "0", "unitall": "", "install_way": "quick_start"}' https://log.rainbond.com/log/install
-EOF
-
     EID=`sed -nr "s#EID: \"(.*)\"#\1#p" /etc/ansible/roles/install-rainbond/defaults/main.yml`
     IID=`sed -nr "s#IID: \"(.*)\"#\1#p" /etc/ansible/roles/install-rainbond/defaults/main.yml`
-    ITYPE=`sed -nr "s#INSTALL_SOURCE: \"(.*)\"#\1#p" /etc/ansible/roles/install-rainbond/defaults/main.yml`
-    sed -i "s#IID#${IID}#" /tmp/rbd_install_log
-    sed -i "s#EID#${EID}#" /tmp/rbd_install_log
-    sed -i "s#ITYPE#${ITYPE}#" /tmp/rbd_install_log
+    MESSAGE="installing"
+
+    cat > /tmp/rbd_install_log <<EOF
+curl -H "Content-Type:application/json" -X POST --data '{"install_id": "$IID","eid": "$EID", "version": "v5.2.1-release", "install_source": "${ITYPE}k8s", "status": "startk8s", "message": "$MESSAGE", "is_uninstall": "0", "unitall": "", "install_way": "quick_start"}' https://log.rainbond.com/log/install
+EOF
 
     ${TEST_MODE} || bash /tmp/rbd_install_log > /dev/null 2>&1
 
