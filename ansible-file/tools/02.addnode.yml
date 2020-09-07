@@ -37,6 +37,12 @@
     ignore_errors: true
     when: "CONTAINER_RUNTIME == 'containerd'"
 
+  - name: 创建 rainbond 相关目录
+  file: path={{ item }} state=directory
+  with_items:
+    - /opt/kube/rainbond
+    - /opt/kube/rainbond/images
+    
   - name: 推送rainbond的离线镜像包
     copy: src={{ base_dir }}/rainbond/images/{{ item }} dest=/opt/kube/rainbond/images/{{ item }}
     with_items:
