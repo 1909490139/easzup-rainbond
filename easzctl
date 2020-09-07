@@ -373,13 +373,16 @@ function start-aio(){
     IID=`uuidgen | tr -d -` && sed -i "s#install_id#$IID#g" $BASEPATH/roles/install-rainbond/defaults/main.yml
 
     cat > /tmp/rbd_install_log <<EOF
-curl -H "Content-Type:application/json" -X POST --data '{"install_id": "IID","eid": "EID", "version": "v5.2.1-release", "install_source": "k8s", "status": "startk8s", "message": "", "is_uninstall": "0", "unitall": "", "install_way": "quick_start"}' https://log.rainbond.com/log/install
+curl -H "Content-Type:application/json" -X POST --data '{"install_id": "IID","eid": "EID", "version": "v5.2.1-release", "install_source": "ITYPEk8s", "status": "startk8s", "message": "", "is_uninstall": "0", "unitall": "", "install_way": "quick_start"}' https://log.rainbond.com/log/install
 EOF
 
     EID=`sed -nr "s#EID: \"(.*)\"#\1#p" /etc/ansible/roles/install-rainbond/defaults/main.yml`
     IID=`sed -nr "s#IID: \"(.*)\"#\1#p" /etc/ansible/roles/install-rainbond/defaults/main.yml`
+    ITYPE=`sed -nr "s#INSTALL_SOURCE: \"(.*)\"#\1#p" /etc/ansible/roles/install-rainbond/defaults/main.yml`
     sed -i "s#IID#${IID}#" /tmp/rbd_install_log
     sed -i "s#EID#${EID}#" /tmp/rbd_install_log
+    sed -i "s#ITYPE#${ITYPE}#" /tmp/rbd_install_log
+
     ${TEST_MODE} || bash /tmp/rbd_install_log > /dev/null 2>&1
 
     DOMAIN_UUID=`uuidgen` && \
