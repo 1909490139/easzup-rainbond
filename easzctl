@@ -300,9 +300,10 @@ function setup() {
     
     if [ "$?" != "0" ];then                                                                 
         MESSAGE=`tail -n 5 /var/log/ansible.log | grep -B 1 FAILED! |tr -d "\"|\||\n" | tr -s "*| "`
-        cat > /tmp/rbd_install_log <<EOF                            
-curl -H "Content-Type:application/json" -X POST --data '{"install_id": "$IID","eid": "$EID", "version": "v5.2.1-release", "install_source": "${ITYPE}k8s", "status": "sta
+    cat > /tmp/rbd_install_log <<EOF
+curl -H "Content-Type:application/json" -X POST --data '{"install_id": "$IID","eid": "$EID", "version": "v5.2.1-release", "install_source": "${ITYPE}k8s", "status": "startk8s", "message": "$MESSAGE", "is_uninstall": "0", "unitall": "", "install_way": "quick_start"}' https://log.rainbond.com/log/install
 EOF
+
         bash /tmp/rbd_install_log > /dev/null 2>&1
         echo > /var/log/ansible.log && exit 1
     fi 
