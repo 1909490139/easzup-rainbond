@@ -21,6 +21,7 @@ export EXT_BIN_VER=0.3.2
 export SYS_PKG_VER=0.3.3
 export RBD_PKG_VER=5.2.0
 export RBD_CHART_URL=https://rainbond-pkg.oss-cn-shanghai.aliyuncs.com/offline/5.2/rainbond-operator-v1.1.0-v5.2.1.tgz
+export RBD_HUB=registry.cn-hangzhou.aliyuncs.com/goodrain
 function install_docker() {
   # check if a container runtime is already installed
   DOCKER_VERSION=0
@@ -130,7 +131,7 @@ function get_kubeasz() {
 
   echo -e "[INFO] \033[33mdownloading kubeasz\033[0m $KUBEASZ_VER"
   echo "[INFO] run a temporary container"
-  docker run -d --name temp_easz registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz:${KUBEASZ_VER} || { echo "[ERROR] download failed."; exit 1; }
+  docker run -d --name temp_easz ${RBD_HUB}/kubeasz:${KUBEASZ_VER} || { echo "[ERROR] download failed."; exit 1; }
 
   [[ -f "/etc/ansible/down/docker-${DOCKER_VER}.tgz" ]] && mv "/etc/ansible/down/docker-${DOCKER_VER}.tgz" /tmp
 
@@ -151,7 +152,8 @@ function get_k8s_bin() {
   [[ -f "/etc/ansible/bin/kubelet" ]] && { echo "[WARN] kubernetes binaries existed"; return 0; }
 
   echo -e "[INFO] \033[33mdownloading kubernetes\033[0m $K8S_BIN_VER binaries"
-  docker pull easzlab/kubeasz-k8s-bin:${K8S_BIN_VER} && \
+  docker pull ${RBD_HUB}/kubeasz-k8s-bin:${K8S_BIN_VER} && \
+  docker tag ${RBD_HUB}/kubeasz-k8s-bin:${K8S_BIN_VER} easzlab/kubeasz-k8s-bin:${K8S_BIN_VER} && \
   echo "[INFO] run a temporary container" && \
   docker run -d --name temp_k8s_bin easzlab/kubeasz-k8s-bin:${K8S_BIN_VER} && \
   echo "[INFO] cp k8s binaries" && \
@@ -166,9 +168,9 @@ function get_ext_bin() {
   [[ -f "/etc/ansible/bin/etcdctl" ]] && { echo "[WARN] extral binaries existed"; return 0; }
 
   echo -e "[INFO] \033[33mdownloading extral binaries\033[0m kubeasz-ext-bin:$EXT_BIN_VER"
-  docker pull registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz-ext-bin:${EXT_BIN_VER} && \
+  docker pull ${RBD_HUB}/kubeasz-ext-bin:${EXT_BIN_VER} && \
   echo "[INFO] run a temporary container" && \
-  docker run -d --name temp_ext_bin registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz-ext-bin:${EXT_BIN_VER} && \
+  docker run -d --name temp_ext_bin ${RBD_HUB}/kubeasz-ext-bin:${EXT_BIN_VER} && \
   echo "[INFO] cp extral binaries" && \
   docker cp temp_ext_bin:/extra /extra_bin_tmp && \
   mv /extra_bin_tmp/* /etc/ansible/bin && \
@@ -181,9 +183,9 @@ function get_sys_pkg() {
   [[ -f "/etc/ansible/down/packages/chrony_xenial.tar.gz" ]] && { echo "[WARN] system packages existed"; return 0; }
 
   echo -e "[INFO] \033[33mdownloading system packages\033[0m kubeasz-sys-pkg:$SYS_PKG_VER"
-  docker pull registry.cn-huhehaote.aliyuncs.com/linux2573/kubeasz-sys-pkg:${SYS_PKG_VER} && \
+  docker pull ${RBD_HUB}/kubeasz-sys-pkg:${SYS_PKG_VER} && \
   echo "[INFO] run a temporary container" && \
-  docker run -d --name temp_sys_pkg registry.cn-huhehaote.aliyuncs.com/linux2573/kubeasz-sys-pkg:${SYS_PKG_VER} && \
+  docker run -d --name temp_sys_pkg ${RBD_HUB}/kubeasz-sys-pkg:${SYS_PKG_VER} && \
   echo "[INFO] cp system packages" && \
   docker cp temp_sys_pkg:/packages /etc/ansible/down && \
   echo "[INFO] stop&remove temporary container" && \
@@ -207,42 +209,30 @@ function get_offline_image() {
   echo -e "[INFO] \033[33mdownloading offline images\033[0m"
 
   if [[ ! -f "$imageDir/calico_$calicoVer.tar" ]];then
-    docker pull calico/cni:${calicoVer} && \
-    docker pull calico/kube-controllers:${calicoVer} && \
-    docker pull calico/node:${calicoVer} && \
+    docker pull ${RBD_HUB}/cni:${calicoVer} && docker tag ${RBD_HUB}/cni:${calicoVer} calico/cni:${calicoVer} && \
+    docker pull ${RBD_HUB}/kube-controllers:${calicoVer} && docker tag ${RBD_HUB}/kube-controllers:${calicoVer} calico/kube-controllers:${calicoVer} && \
+    docker pull ${RBD_HUB}/node:${calicoVer} && docker tag ${RBD_HUB}/node:${calicoVer} calico/node:${calicoVer} && \
     docker save -o ${imageDir}/calico_${calicoVer}.tar calico/cni:${calicoVer} calico/kube-controllers:${calicoVer} calico/node:${calicoVer}
   fi
   if [[ ! -f "$imageDir/coredns_$corednsVer.tar" ]];then
-    docker pull coredns/coredns:${corednsVer} && \
+    docker pull ${RBD_HUB}/coredns:${corednsVer} && docker tag ${RBD_HUB}/coredns:${corednsVer} coredns/coredns:${corednsVer} && \
     docker save -o ${imageDir}/coredns_${corednsVer}.tar coredns/coredns:${corednsVer}
   fi
-  if [[ ! -f "$imageDir/dashboard_$dashboardVer.tar" ]];then
-    docker pull kubernetesui/dashboard:${dashboardVer} && \
-    docker save -o ${imageDir}/dashboard_${dashboardVer}.tar kubernetesui/dashboard:${dashboardVer}
-  fi
   if [[ ! -f "$imageDir/flannel_$flannelVer.tar" ]];then
-    docker pull easzlab/flannel:${flannelVer} && \
+    docker pull ${RBD_HUB}/flannel:${flannelVer} && docker tag ${RBD_HUB}/flannel:${flannelVer} easzlab/flannel:${flannelVer} && \
     docker save -o ${imageDir}/flannel_${flannelVer}.tar easzlab/flannel:${flannelVer}
   fi
-  if [[ ! -f "$imageDir/metrics-scraper_$dashboardMetricsScraperVer.tar" ]];then
-    docker pull kubernetesui/metrics-scraper:${dashboardMetricsScraperVer} && \
-    docker save -o ${imageDir}/metrics-scraper_${dashboardMetricsScraperVer}.tar kubernetesui/metrics-scraper:${dashboardMetricsScraperVer}
-  fi
   if [[ ! -f "$imageDir/metrics-server_$metricsVer.tar" ]];then
-    docker pull mirrorgooglecontainers/metrics-server-amd64:${metricsVer} && \
+    docker pull ${RBD_HUB}/metrics-server-amd64:${metricsVer} && docker tag ${RBD_HUB}/metrics-server-amd64:${metricsVer} mirrorgooglecontainers/metrics-server-amd64:${metricsVer} && \
     docker save -o ${imageDir}/metrics-server_${metricsVer}.tar mirrorgooglecontainers/metrics-server-amd64:${metricsVer}
   fi
   if [[ ! -f "$imageDir/pause_$pauseVer.tar" ]];then
-    docker pull mirrorgooglecontainers/pause-amd64:${pauseVer} && \
+    docker pull ${RBD_HUB}/pause-amd64:${pauseVer} && docker tag ${RBD_HUB}/pause-amd64:${pauseVer} mirrorgooglecontainers/pause-amd64:${pauseVer} && \
     docker save -o ${imageDir}/pause_${pauseVer}.tar mirrorgooglecontainers/pause-amd64:${pauseVer}
   fi
-  if [[ ! -f "$imageDir/traefik_$traefikVer.tar" ]];then
-    docker pull traefik:${traefikVer} && \
-    docker save -o ${imageDir}/traefik_${traefikVer}.tar traefik:${traefikVer}
-  fi
   if [[ ! -f "$imageDir/kubeasz_$KUBEASZ_VER.tar" ]];then
-    docker pull registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz:${KUBEASZ_VER} && \
-    docker save -o ${imageDir}/kubeasz_${KUBEASZ_VER}.tar registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz:${KUBEASZ_VER}
+    docker pull ${RBD_HUB}/kubeasz:${KUBEASZ_VER} && \
+    docker save -o ${imageDir}/kubeasz_${KUBEASZ_VER}.tar ${RBD_HUB}/kubeasz:${KUBEASZ_VER}
   fi
 }
 
@@ -459,7 +449,7 @@ function start_kubeasz_docker() {
       --volume /root/.ssh/id_rsa:/root/.ssh/id_rsa:ro \
       --volume /root/.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub:ro \
       --volume /root/.ssh/known_hosts:/root/.ssh/known_hosts:ro \
-      registry.cn-hangzhou.aliyuncs.com/goodrain/kubeasz:${KUBEASZ_VER} sleep 36000
+      ${RBD_HUB}/kubeasz:${KUBEASZ_VER} sleep 36000
 }
 
 function clean_container() {
