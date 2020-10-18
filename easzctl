@@ -302,7 +302,7 @@ function setup() {
         MESSAGE_BASE=`tail -n 5 /var/log/ansible.log | grep -B 1 FAILED |tr -d "\"|\||\n" | tr -s "*| "`
         MESSAGE=`echo ${MESSAGE_BASE:0:1098}`
     cat > /tmp/rbd_install_log <<EOF
-curl -H "Content-Type:application/json" --retry 3 --retry-max-time 30 -X POST --data '{"install_id": "$IID","eid": "$EID", "version": "v5.2.2-release", "install_source": "${ITYPE}k8s", "status": "k8sfailure", "message": "$MESSAGE", "is_uninstall": "0", "unitall": "", "install_way": "quick_start"}' https://log.rainbond.com/log/install
+curl -H "Content-Type:application/json" --retry 3 --retry-max-time 30 -X POST --data '{"install_id": "$IID","eid": "$EID", "version": "v5.2.2-beta2", "install_source": "${ITYPE}k8s", "status": "k8sfailure", "message": "$MESSAGE", "is_uninstall": "0", "unitall": "", "install_way": "quick_start"}' https://log.rainbond.com/log/install
 EOF
 
         bash /tmp/rbd_install_log > /dev/null 2>&1
@@ -390,7 +390,7 @@ function start-aio(){
     MESSAGE="installing"
 
     cat > /tmp/rbd_install_log <<EOF
-curl -H "Content-Type:application/json" --retry 3 --retry-max-time 30 -X POST --data '{"install_id": "$IID","eid": "$EID", "version": "v5.2.2-release", "install_source": "${ITYPE}k8s", "status": "startk8s", "message": "$MESSAGE", "is_uninstall": "0", "unitall": "", "install_way": "quick_start"}' https://log.rainbond.com/log/install
+curl -H "Content-Type:application/json" --retry 3 --retry-max-time 30 -X POST --data '{"install_id": "$IID","eid": "$EID", "version": "v5.2.2-beta2", "install_source": "${ITYPE}k8s", "status": "startk8s", "message": "$MESSAGE", "is_uninstall": "0", "unitall": "", "install_way": "quick_start"}' https://log.rainbond.com/log/install
 EOF
 
     ${TEST_MODE} || bash /tmp/rbd_install_log > /dev/null 2>&1

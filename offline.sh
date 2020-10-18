@@ -22,7 +22,7 @@ function ansible_image_list(){
 
 function build_kubeasz_image(){
 
-    KUBEASZ_VER=2.1.2
+    KUBEASZ_VER=2.1.2-beta2
 
     ansible_image_list
 
