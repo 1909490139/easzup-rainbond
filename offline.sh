@@ -16,7 +16,7 @@ function ansible_image_list(){
 
     sed -i "/RAINBOND-IMAGE-LIST/d" ./ansible-file/roles/install-rainbond/tasks/*.yml ;
 
-    sed -i "/RAINBOND-IMAGE-LIST/d" ./ansible-file/*.yml ;
+    sed -i "/RAINBOND-IMAGE-LIST/d" ./ansible-file/tools/*.yml ;
 
 }
 
