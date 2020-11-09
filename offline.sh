@@ -4,7 +4,7 @@ function ansible_image_list(){
     
     cp ./ansible-base/main.yml ./ansible-file/roles/install-rainbond/tasks/main.yml
     cp ./ansible-base/rbdaio.yml ./ansible-file/roles/install-rainbond/tasks/rbdaio.yml
-    cp ./ansible-base/02.addnode.yml ./ansible-file/tools/02.addnode.yml
+    rm -rf ./ansible-file/tools && mkdir ./ansible-file/tools && cp ./ansible-base/02.addnode.yml ./ansible-file/tools/02.addnode.yml
 
     cat images_list | tr "/" ":" | awk -F":" '{print $3".tar.gz"}' | while read line ;do 
         sed -i "/RAINBOND-IMAGE-LIST/a\          \- \"$line\"" ./ansible-file/roles/install-rainbond/tasks/*.yml ;
