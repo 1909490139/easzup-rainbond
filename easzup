@@ -334,7 +334,7 @@ function get_rainbond_image(){
   sed -i 's/^INSTALL_SOURCE.*$/INSTALL_SOURCE: "offline"/g' /etc/ansible/roles/kube-node/defaults/main.yml
   sed -i 's/^INSTALL_SOURCE.*$/INSTALL_SOURCE: "offline"/g' /etc/ansible/roles/prepare/defaults/main.yml
   sed -i 's/^INSTALL_SOURCE.*$/INSTALL_SOURCE: "offline"/g' /etc/ansible/roles/install-rainbond/defaults/main.yml
-
+  sed -i 's/DOCKER/docker/g' /etc/ansible/tools/02.addnode.yml
 }
 
 function download_all() {

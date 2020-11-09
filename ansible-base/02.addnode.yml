@@ -42,6 +42,7 @@
     with_items:
     RAINBOND-IMAGE-LIST
     ignore_errors: true
+    when: "CONTAINER_RUNTIME == 'DOCKER'"
 
   - name: 导入离线镜像（若执行失败，可忽略）
     shell: ls /opt/kube/rainbond/images/*.tar.gz |while read n;do {{ bin_dir }}/docker load -i $n ;done
