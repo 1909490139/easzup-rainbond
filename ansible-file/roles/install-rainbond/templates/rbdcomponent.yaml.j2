@@ -224,11 +224,11 @@ items:
     labels:
       belongTo: rainbond-operator
       creator: Rainbond
-      name: rbd-repo
-    name: rbd-repo
+      name: rbd-resource-proxy
+    name: rbd-resource-proxy
     namespace: rbd-system
   spec:
-    image: {{ IMAGE_URL }}/rbd-repo:6.16.0
+    image: {{ IMAGE_URL }}/rbd-resource-proxy:{{ RBD_VERSION }}
     imagePullPolicy: IfNotPresent
     priorityComponent: false
     replicas: 1
