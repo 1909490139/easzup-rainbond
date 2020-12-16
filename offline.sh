@@ -22,7 +22,7 @@ function ansible_image_list(){
 
 function build_kubeasz_image(){
 
-    KUBEASZ_VER=v5.3.0
+    KUBEASZ_VER=v5.3.0-enterprise
 
     ansible_image_list
 
